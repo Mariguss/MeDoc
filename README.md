@@ -27,5 +27,6 @@
 ---
 ER - модель (черновой вариант)
 
-<img width="741" height="484" alt="image" src="https://github.com/user-attachments/assets/4e3ba05b-4610-4626-9f20-ff37af1a843c" />
+<img width="709" height="368" alt="image" src="https://github.com/user-attachments/assets/6eebace1-1ee7-4360-9ea4-d96693dfd5f6" />
+
 
