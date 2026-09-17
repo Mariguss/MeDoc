@@ -15,7 +15,7 @@ class RunSettings(BaseModel):
     port: int = 8005
 
 class DatabaseSettings(BaseModel):
-    url: str | None = SQLITE_DB_PATH
+    url: str | None = f"sqlite+aiosqlite:///{SQLITE_DB_PATH}"
     db_name: str | None = None
     db_user: str | None = None
     db_password: str | None = None
