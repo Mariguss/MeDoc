@@ -6,11 +6,12 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.models import Base
-from app.core.models.mixins import IntIdPKMixin
+from app.core.model import Base
+from app.core.model.mixin import IntIdPKMixin
 
 if TYPE_CHECKING:
     ...
 
-class Disease(Base, IntIdPKMixin):
+class Medicine(Base, IntIdPKMixin):
     name: Mapped[str] = mapped_column(String(50))
+    properties: Mapped[str]
