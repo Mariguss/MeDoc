@@ -6,7 +6,7 @@ from pydantic_settings import (
     SettingsConfigDict
 )
 
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent.parent.parent
 SQLITE_DB_PATH = str(BASE_DIR / "db.sqlite3")
 
 
