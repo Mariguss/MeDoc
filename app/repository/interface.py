@@ -5,20 +5,25 @@ from abc import (
 from typing import (
     Generic,
     TypeVar,
+    TypedDict,
 )
 
 T = TypeVar("T")
+
+class ReadResult(TypedDict, Generic[T]):
+    founds: list[T]
+    total_count: int
 
 class BaseRepositoryABC(Generic[T], ABC):
 
     @abstractmethod
     async def read_by_options(
             self,
-            schema: T | None = None,
             page: int = 1,
             page_size: int = 10,
             ordering: str = "-id",
-    ) -> dict:
+            **kwargs
+    ) -> ReadResult[T]:
         """
             Возвращает:
             {
@@ -37,7 +42,7 @@ class BaseRepositoryABC(Generic[T], ABC):
         ...
 
     @abstractmethod
-    async def update(self, id: int, schema: T) -> T:
+    async def update(self, id: int, schema: T) -> T | None:
         ...
 
     @abstractmethod
