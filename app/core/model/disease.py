@@ -6,7 +6,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.model import Base
+from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
 
 if TYPE_CHECKING:

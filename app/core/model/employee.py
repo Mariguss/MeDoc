@@ -10,7 +10,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.model import Base
+from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
 
 if TYPE_CHECKING:
@@ -28,3 +28,4 @@ class Employee(Base, IntIdPKMixin):
         Enum(Role),
         default=Role.DOCTOR,
     )
+    speciality: Mapped[str | None] = mapped_column(String(50))

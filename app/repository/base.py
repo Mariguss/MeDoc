@@ -66,7 +66,7 @@ class BaseRepository(Generic[T]):
         return result.scalars().first()
 
     async def create(self, schema: T) -> T:
-        obj = self._model(schema.model_dump(exclude_none=True))
+        obj = self._model(**schema.model_dump(exclude_none=True))
         self._session.add(obj)
 
         return obj
@@ -79,7 +79,7 @@ class BaseRepository(Generic[T]):
         if obj is None:
             return None
 
-        data = schema.model_dump(exclude_none=True)
+        data = schema.model_dump(exclude_unset=True)
         for k, v in data.items():
             setattr(obj, k, v)
 

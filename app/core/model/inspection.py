@@ -11,7 +11,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.model import Base
+from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
 
 if TYPE_CHECKING:
@@ -28,14 +28,11 @@ class Inspection(Base, IntIdPKMixin):
 
     # будут изменения?
     doctor_id: Mapped[int] = mapped_column(
-        ForeignKey('doctors.id'),
-        on_delete='RESTRICT',
+        ForeignKey('employees.id', ondelete='RESTRICT'),
     )
     patient_id: Mapped[int] = mapped_column(
-        ForeignKey('patients.id'),
-        on_delete='RESTRICT',
+        ForeignKey('patients.id', ondelete='RESTRICT'),
     )
     disease_id: Mapped[int | None] = mapped_column(
-        ForeignKey('disease.id'),
-        ondelete='SET NULL',
+        ForeignKey('diseases.id', ondelete='SET NULL'),
     )
