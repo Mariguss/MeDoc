@@ -45,13 +45,6 @@ class BaseRepository(Generic[T]):
             ordering: str = "-id",
             **kwargs,
     ) -> ReadResult[T]:
-        """
-            Возвращает:
-            {
-                "founds": List[T],
-                "total_count": int,
-            }
-        """
         async with self._session_factory() as session:
             stmt = select(self._model)
             stmt = self._build_stmt_with_filters(stmt, **kwargs)
