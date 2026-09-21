@@ -16,13 +16,13 @@ from app.core.model.mixin import IntIdPKMixin
 if TYPE_CHECKING:
     ...
 
-class Role(enum.Enum):
-    DOCTOR = 1
-    ADMIN = 2
+class Role(str, enum.Enum):
+    DOCTOR = "doctor"
+    ADMIN = "admin"
 
 class Employee(Base, IntIdPKMixin):
     login: Mapped[str] = mapped_column(String(15))
-    password_hash: Mapped[str]
+    password_hash:  Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(50))
     role: Mapped[Role] = mapped_column(
         Enum(Role),
