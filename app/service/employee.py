@@ -1,4 +1,3 @@
-from app.core.schema.employee import EmployeeCreate
 from app.repository.employee import EmployeeRepository
 
 
