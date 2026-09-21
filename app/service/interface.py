@@ -7,16 +7,18 @@ from typing import (
     TypeVar,
 )
 
+from app.repository.interface import ReadResult
+
 T = TypeVar("T")
 
 class BaseServiceABC(Generic[T], ABC):
 
     @abstractmethod
-    async def get_list(self, schema: T | None = None) -> list[T]:
+    async def get_list(self, **kwargs) -> ReadResult[T]:
         ...
 
     @abstractmethod
-    async def get_by_id(self, id: int) -> T | None:
+    async def get_by_id(self, id_: int) -> T | None:
         ...
 
     @abstractmethod
@@ -24,9 +26,9 @@ class BaseServiceABC(Generic[T], ABC):
         ...
 
     @abstractmethod
-    async def patch(self, id: int, schema: T) -> T:
+    async def patch(self, id_: int, schema: T) -> T:
         ...
 
     @abstractmethod
-    async def remove_by_id(self, id: int) -> None:
+    async def remove_by_id(self, id_: int) -> None:
         ...
