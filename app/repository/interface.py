@@ -24,13 +24,6 @@ class BaseRepositoryABC(Generic[T], ABC):
             ordering: str = "-id",
             **kwargs
     ) -> ReadResult[T]:
-        """
-            Возвращает:
-            {
-                "founds": List[T],
-                "total_count": int,
-            }
-        """
         ...
 
     @abstractmethod
