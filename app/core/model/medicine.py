@@ -15,3 +15,4 @@ if TYPE_CHECKING:
 class Medicine(Base, IntIdPKMixin):
     name: Mapped[str] = mapped_column(String(50))
     properties: Mapped[str]
+    side_effects: Mapped[str]

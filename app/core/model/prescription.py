@@ -15,7 +15,7 @@ from app.core.model.mixin import IntIdPKMixin
 if TYPE_CHECKING:
     ...
 
-class Prescriptions(Base, IntIdPKMixin):
+class Prescription(Base, IntIdPKMixin):
     __table_args__ = (
         UniqueConstraint(
             'inspection_id',
@@ -32,4 +32,4 @@ class Prescriptions(Base, IntIdPKMixin):
     )
 
     intake_method: Mapped[str]
-    side_effects: Mapped[str | None]
+    note: Mapped[str | None]
