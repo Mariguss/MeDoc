@@ -27,7 +27,7 @@ class BaseRepositoryABC(Generic[T], ABC):
         ...
 
     @abstractmethod
-    async def read_by_id(self, id: int) -> T | None:
+    async def read_by_id(self, id_: int) -> T | None:
         ...
 
     @abstractmethod
@@ -35,9 +35,9 @@ class BaseRepositoryABC(Generic[T], ABC):
         ...
 
     @abstractmethod
-    async def update(self, id: int, schema: T) -> T | None:
+    async def update(self, id_: int, schema: T) -> T | None:
         ...
 
     @abstractmethod
-    async def delete_by_id(self, id: int) -> None:
+    async def delete_by_id(self, id_: int) -> None:
         ...
