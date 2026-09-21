@@ -1,27 +1,34 @@
-from typing import TypeVar
+class DuplicatedError(Exception):
+    """Выбрасывается при нарушении уникальности (дубликат)."""
+    def __init__(self, detail: str = "Record already exists"):
+        self.detail = detail
+        super().__init__(self.detail)
 
-from fastapi import HTTPException, status
+class RelationshipViolationError(Exception):
+    """Выбрасывается при попытке нарушить связи (FK) или удалить зависимую запись."""
+    def __init__(self, detail: str = "Cannot perform operation due to relationship constraints"):
+        self.detail = detail
+        super().__init__(self.detail)
 
+class NotFoundError(Exception):
+    """Выбрасывается, когда ресурс не найден."""
+    def __init__(self, detail: str = "Resource not found"):
+        self.detail = detail
+        super().__init__(self.detail)
 
-T = TypeVar("T")
+class AuthError(Exception):
+    """Выбрасывается при проблемах с авторизацией/аутентификацией."""
+    def __init__(self, detail: str = "Authentication failed"):
+        self.detail = detail
+        super().__init__(self.detail)
 
-class DuplicatedError(HTTPException):
-    def __init__(self, detail: str | None= None, headers: dict[str, T] | None = None) -> None:
-        super().__init__(status.HTTP_400_BAD_REQUEST, detail, headers)
+class WrongCredentialsError(AuthError):
+    """Частный случай AuthError."""
+    def __init__(self, detail: str = "Invalid username or password"):
+        super().__init__(detail)
 
-class WrongCredentialsError(DuplicatedError):
-    pass
-
-class AuthError(HTTPException):
-    def __init__(self, detail: str | None= None, headers: dict[str, T] | None = None) -> None:
-        super().__init__(status.HTTP_403_FORBIDDEN, detail, headers)
-
-
-class NotFoundError(HTTPException):
-    def __init__(self, detail: str | None= None, headers: dict[str, T] | None = None) -> None:
-        super().__init__(status.HTTP_404_NOT_FOUND, detail, headers)
-
-
-class ValidationError(HTTPException):
-    def __init__(self, detail: str | None= None, headers: dict[str, T] | None = None) -> None:
-        super().__init__(status.HTTP_422_UNPROCESSABLE_ENTITY, detail, headers)
+class ValidationError(Exception):
+    """Выбрасывается при ошибке валидации данных (не Pydantic)."""
+    def __init__(self, detail: str = "Invalid data provided"):
+        self.detail = detail
+        super().__init__(self.detail)
