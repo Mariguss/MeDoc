@@ -1,8 +1,8 @@
-"""new_table_many_to_many_inspection_disease
+"""added_unique_constraints
 
-Revision ID: b660f1c0d88e
+Revision ID: 2d45226e8595
 Revises: 
-Create Date: 2026-09-22 18:11:54.651374
+Create Date: 2026-09-22 20:22:57.674235
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'b660f1c0d88e'
+revision: str = '2d45226e8595'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,7 +24,8 @@ def upgrade() -> None:
     op.create_table('diseases',
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_diseases'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_diseases')),
+    sa.UniqueConstraint('name', name=op.f('uq_diseases_name'))
     )
     op.create_table('employees',
     sa.Column('login', sa.String(length=15), nullable=False),
@@ -40,13 +41,14 @@ def upgrade() -> None:
     sa.Column('properties', sa.String(), nullable=False),
     sa.Column('side_effects', sa.String(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_medicines'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_medicines')),
+    sa.UniqueConstraint('name', name=op.f('uq_medicines_name'))
     )
     op.create_table('patients',
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('sex', sa.Enum('MALE', 'FEMALE', name='sex'), nullable=False),
-    sa.Column('born_date', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('home_address', sa.String(), nullable=False),
+    sa.Column('born_date', sa.Date(), nullable=False),
+    sa.Column('home_address', sa.String(length=100), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_patients'))
     )

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import (
     String,
     Enum,
-    DateTime,
+    Date,
 )
 from sqlalchemy.orm import (
     Mapped,
@@ -28,7 +28,7 @@ class Patient(Base, IntIdPKMixin):
         Enum(Sex),
         default=Sex.FEMALE,
     )
-    born_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True),
+    born_date: Mapped[datetime.date] = mapped_column(
+        Date,
     )
-    home_address: Mapped[str]
+    home_address: Mapped[str | None] = mapped_column(String(100))

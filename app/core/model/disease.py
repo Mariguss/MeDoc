@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from app.core.model.inspection import Inspection
 
 class Disease(Base, IntIdPKMixin):
-    name: Mapped[str] = mapped_column(String(50))
+    name: Mapped[str] = mapped_column(String(50), unique=True)
 
     inspections: Mapped[list["Inspection"]] = relationship(
         "Inspection",
