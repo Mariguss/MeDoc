@@ -18,9 +18,9 @@ from app.core.model.mixin import IntIdPKMixin
 if TYPE_CHECKING:
     ...
 
-class Sex(enum.Enum):
-    MALE = 1
-    FEMALE = 2
+class Sex(str, enum.Enum):
+    MALE = "m"
+    FEMALE = "f"
 
 class Patient(Base, IntIdPKMixin):
     name: Mapped[str] = mapped_column(String(50))
