@@ -9,13 +9,14 @@ from sqlalchemy import (
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
+    relationship,
 )
 
 from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
 
 if TYPE_CHECKING:
-    ...
+    from app.core.model.disease import Disease
 
 class Inspection(Base, IntIdPKMixin):
     date: Mapped[datetime.datetime] = mapped_column(
@@ -33,6 +34,9 @@ class Inspection(Base, IntIdPKMixin):
     patient_id: Mapped[int] = mapped_column(
         ForeignKey('patients.id', ondelete='RESTRICT'),
     )
-    disease_id: Mapped[int | None] = mapped_column(
-        ForeignKey('diseases.id', ondelete='SET NULL'),
+
+    diseases: Mapped[list["Disease"]] = relationship(
+        "Disease",
+        secondary="inspectiondiseases",
+        back_populates="inspections",
     )

@@ -7,7 +7,8 @@ all = (
     "Inspection",
     "Medicine",
     "Patient",
-    "Prescription"
+    "Prescription",
+    "InspectionDisease",
 )
 
 from app.core.model.base import Base
@@ -18,3 +19,4 @@ from app.core.model.inspection import Inspection
 from app.core.model.medicine import Medicine
 from app.core.model.patient import Patient
 from app.core.model.prescription import Prescription
+from app.core.model.inspection_disease import InspectionDisease
