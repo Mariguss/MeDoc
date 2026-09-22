@@ -11,6 +11,7 @@ from app.core.exception import (
     RelationshipViolationError,
     NotFoundError,
 )
+from app.repository.interface import ReadResult
 
 T = TypeVar("T")
 
@@ -19,15 +20,20 @@ class BaseService(Generic[T]):
     def __init__(self, repository) -> None:
         self._repository = repository
 
-    async def get_list(self, **kwargs) -> list[T]:
+    async def get_list(self, **kwargs) -> ReadResult[T]:
         return await self._repository.read_by_options(**kwargs)
 
-    async def get_by_id(self, id_: int) -> T | None:
-        return await self._repository.read_by_id(id_)
+    async def get_by_id(self, id_: int) -> T:
+        obj = await self._repository.read_by_id(id_)
+        if obj is None:
+            raise NotFoundError(
+                detail=f"Запись с ID {id_} не найдена."
+            )
+        return obj
 
     async def add(self, schema: T) -> T:
-        obj = await self._repository.create(schema)
         try:
+            obj = await self._repository.create(schema)
             await self._repository._session.commit()
             await self._repository._session.refresh(obj)
             return obj
@@ -38,12 +44,12 @@ class BaseService(Generic[T]):
             )
 
     async def patch(self, id_: int, schema: T) -> T:
-        obj = await self._repository.update(id_, schema)
-        if obj is None:
-            raise NotFoundError(
-                detail=f"Запись с ID {id_} не найдена."
-            )
         try:
+            obj = await self._repository.update(id_, schema)
+            if obj is None:
+                raise NotFoundError(
+                    detail=f"Запись с ID {id_} не найдена."
+                )
             await self._repository._session.commit()
             await self._repository._session.refresh(obj)
             return obj
@@ -54,9 +60,8 @@ class BaseService(Generic[T]):
             )
 
     async def remove_by_id(self, id_: int) -> None:
-        await self._repository.delete_by_id(id_)
-
         try:
+            await self._repository.delete_by_id(id_)
             await self._repository._session.commit()
         except IntegrityError:
             await self._repository._session.rollback()

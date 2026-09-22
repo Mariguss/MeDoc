@@ -1,8 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import database
-from app.core.schema.employee import EmployeeResponseAdmin, EmployeeCreate, EmployeeUpdate
+from app.core.schema.base import PaginatedResponse
+from app.core.schema.employee import (
+    EmployeeResponseAdmin,
+    EmployeeCreate,
+    EmployeeUpdate,
+    EmployeeResponse,
+)
 from app.repository.employee import EmployeeRepository
 from app.service.employee import EmployeeService
 
@@ -23,7 +33,22 @@ async def get_employee_service(
 ) -> EmployeeService:
     return EmployeeService(repo)
 
-
+@router.get(
+    "/",
+    response_model=PaginatedResponse[EmployeeResponse],
+    status_code=200,
+)
+async def get_employees(
+        service: EmployeeService = Depends(get_employee_service),
+        page: int = 1,
+        page_size: int = 10,
+        ordering: str = "-id",
+):
+    return await service.get_list(
+        page=page,
+        page_size=page_size,
+        ordering=ordering,
+    )
 @router.get(
     "/{id_}",
     response_model=EmployeeResponseAdmin,
