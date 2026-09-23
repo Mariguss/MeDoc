@@ -6,7 +6,7 @@ from fastapi import (
 
 from app.core.dependencies import get_inspection_service
 from app.core.schema.base import PaginatedResponse
-from app.core.schema.incpection import (
+from app.core.schema.inspection import (
     InspectionResponse,
     InspectionResponseAdmin,
     InspectionUpdateByAdmin,

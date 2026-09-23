@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import database
 from app.repository.employee import EmployeeRepository
-from app.repository.incpection import InspectionRepository
+from app.repository.inspection import InspectionRepository
 from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.service.employee import EmployeeService

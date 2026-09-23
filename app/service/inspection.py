@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from app.repository.incpection import InspectionRepository
+from app.repository.inspection import InspectionRepository
 from app.service.base import BaseService
 
 class ReadInspectionResult(TypedDict):
