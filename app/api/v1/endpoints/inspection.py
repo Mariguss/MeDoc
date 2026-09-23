@@ -12,7 +12,7 @@ from app.core.schema.incpection import (
     InspectionUpdateByAdmin,
     InspectionCreate,
 )
-from app.service.incpection import InspectionService
+from app.service.inspection import InspectionService
 
 router = APIRouter(
     prefix="/inspection",

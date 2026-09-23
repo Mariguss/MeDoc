@@ -7,7 +7,7 @@ from app.repository.incpection import InspectionRepository
 from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.service.employee import EmployeeService
-from app.service.incpection import InspectionService
+from app.service.inspection import InspectionService
 from app.service.medicine import MedicineService
 from app.service.patient import PatientService
 
