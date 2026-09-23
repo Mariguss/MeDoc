@@ -34,11 +34,11 @@ class BaseService(Generic[T]):
     async def add(self, schema: T) -> T:
         try:
             obj = await self._repository.create(schema)
-            await self._repository._session.commit()
-            await self._repository._session.refresh(obj)
+            await self._repository.session.commit()
+            await self._repository.session.refresh(obj)
             return obj
         except IntegrityError:
-            await self._repository._session.rollback()
+            await self._repository.session.rollback()
             raise DuplicatedError(
                 detail="Запись с такими уникальными атрибутами уже существует."
             )
@@ -50,11 +50,11 @@ class BaseService(Generic[T]):
                 raise NotFoundError(
                     detail=f"Запись с ID {id_} не найдена."
                 )
-            await self._repository._session.commit()
-            await self._repository._session.refresh(obj)
+            await self._repository.session.commit()
+            await self._repository.session.refresh(obj)
             return obj
         except IntegrityError:
-            await self._repository._session.rollback()
+            await self._repository.session.rollback()
             raise DuplicatedError(
                 detail="Обновление не выполнено из-за нарушения уникальности"
             )
@@ -62,9 +62,9 @@ class BaseService(Generic[T]):
     async def remove_by_id(self, id_: int) -> None:
         try:
             await self._repository.delete_by_id(id_)
-            await self._repository._session.commit()
+            await self._repository.session.commit()
         except IntegrityError:
-            await self._repository._session.rollback()
+            await self._repository.session.rollback()
             raise RelationshipViolationError(
                 detail="Невозможно удалить запись: на неё есть ссылки в других таблицах."
             )

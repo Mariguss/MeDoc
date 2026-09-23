@@ -20,7 +20,7 @@ class BaseRepository(Generic[T]):
             session: AsyncSession,
             model: T,
     ) -> None:
-        self._session = session
+        self.session = session
         self._model = model
 
     def _build_stmt_with_filters(self, stmt, **kwargs):
@@ -54,31 +54,31 @@ class BaseRepository(Generic[T]):
         )
 
         stmt_paginated = stmt.limit(page_size).offset((page - 1) * page_size)
-        results = await self._session.execute(stmt_paginated)
+        results = await self.session.execute(stmt_paginated)
         founds = results.scalars().unique().all()
         founds: list[T] = cast(list[T], founds)
 
         count_stmt = select(func.count()).select_from(self._model)
         count_stmt = self._build_stmt_with_filters(count_stmt, **kwargs)
-        total_count = (await self._session.execute(count_stmt)).scalar() or 0
+        total_count = (await self.session.execute(count_stmt)).scalar() or 0
 
         return {"founds": founds, "total_count": total_count}
 
     async def read_by_id(self, id_: int) -> T | None:
         stmt = select(self._model).where(self._model.id == id_)
-        result = await self._session.execute(stmt)
+        result = await self.session.execute(stmt)
 
         return result.scalars().first()
 
     async def create(self, schema: T) -> T:
         obj = self._model(**schema.model_dump(exclude_none=True))
-        self._session.add(obj)
+        self.session.add(obj)
 
         return obj
 
     async def update(self, id_: int, schema: T) -> T | None:
         stmt = select(self._model).where(self._model.id == id_)
-        result = await self._session.execute(stmt)
+        result = await self.session.execute(stmt)
         obj = result.scalars().first()
 
         if obj is None:
@@ -92,10 +92,10 @@ class BaseRepository(Generic[T]):
 
     async def delete_by_id(self, id_: int) -> None:
         stmt = select(self._model).where(self._model.id == id_)
-        result = await self._session.execute(stmt)
+        result = await self.session.execute(stmt)
         obj = result.scalars().first()
 
         if obj is None:
             raise NotFoundError(detail=f"Record with this id({id_}) does not exist.")
 
-        await self._session.delete(obj)
+        await self.session.delete(obj)
