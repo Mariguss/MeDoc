@@ -3,9 +3,8 @@ from fastapi import (
     Depends,
     HTTPException,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import database
+from app.core.dependencies import get_employee_service
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.employee import (
     EmployeeResponseAdmin,
@@ -13,25 +12,12 @@ from app.core.schema.employee import (
     EmployeeUpdate,
     EmployeeResponse,
 )
-from app.repository.employee import EmployeeRepository
 from app.service.employee import EmployeeService
 
 router = APIRouter(
     prefix="/employee",
     tags=["employee"],
 )
-
-# app/api/dependencies.py
-
-async def get_employee_repository(
-    session: AsyncSession = Depends(database.get_session),
-) -> EmployeeRepository:
-    return EmployeeRepository(session)
-
-async def get_employee_service(
-    repo: EmployeeRepository = Depends(get_employee_repository),
-) -> EmployeeService:
-    return EmployeeService(repo)
 
 @router.get(
     "/",

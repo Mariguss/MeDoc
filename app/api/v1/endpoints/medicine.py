@@ -3,9 +3,8 @@ from fastapi import (
     Depends,
     HTTPException,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import database
+from app.core.dependencies import get_medicine_service
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.medicine import (
     MedicineResponse,
@@ -13,7 +12,6 @@ from app.core.schema.medicine import (
     MedicineUpdate,
     MedicineCreate,
 )
-from app.repository.medicine import MedicineRepository
 from app.service.medicine import MedicineService
 
 router = APIRouter(
@@ -21,17 +19,6 @@ router = APIRouter(
     tags=["medicine"],
 )
 
-# app/api/dependencies.py
-
-async def get_medicine_repository(
-    session: AsyncSession = Depends(database.get_session),
-) -> MedicineRepository:
-    return MedicineRepository(session)
-
-async def get_medicine_service(
-    repo: MedicineRepository = Depends(get_medicine_repository),
-) -> MedicineService:
-    return MedicineService(repo)
 
 @router.get(
     "/",
