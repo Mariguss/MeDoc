@@ -30,6 +30,11 @@ class BaseRepository(Generic[T]):
         :param kwargs: словарь с фильтрами
         :return: выражение с добавленными фильтрами
         """
+        if kwargs:
+            for k, v in kwargs.items():
+                col = getattr(self._model, k, None)
+                if col is not None:
+                    stmt = stmt.where(col == v)
         return stmt
 
     async def read_by_options(
