@@ -17,7 +17,8 @@ from app.core.model.mixin import IntIdPKMixin
 
 if TYPE_CHECKING:
     from app.core.model.disease import Disease
-
+# добавить статус
+# в будущем также добавить время создания и обновления
 class Inspection(Base, IntIdPKMixin):
     date: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),

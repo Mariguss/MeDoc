@@ -21,7 +21,7 @@ class Role(str, enum.Enum):
     ADMIN = "admin"
 
 class Employee(Base, IntIdPKMixin):
-    login: Mapped[str] = mapped_column(String(15))
+    login: Mapped[str] = mapped_column(String(15), unique=True)
     password_hash:  Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(50))
     role: Mapped[Role] = mapped_column(

@@ -22,6 +22,7 @@ class Sex(str, enum.Enum):
     MALE = "m"
     FEMALE = "f"
 
+# в будущем добавить паспортные данные или номер телефона
 class Patient(Base, IntIdPKMixin):
     name: Mapped[str] = mapped_column(String(50))
     sex: Mapped[Sex] = mapped_column(
