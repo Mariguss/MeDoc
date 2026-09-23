@@ -7,22 +7,22 @@ from pydantic import (
 from app.core.schema.base import BaseQuery
 
 
-# class InspectionBase(BaseModel):
-#     date: datetime.datetime
-#     address: str | None = None
-#     symptoms: str | None = None
-#     instructions: str | None = None
-#     doctor_id: int
-#     patient_id: int
-#
-#
-# class InspectionResponse(InspectionBase):
-#
-#     model_config = {"from_attributes": True}
-#
-# class InspectionResponseAdmin(InspectionResponse):
-#     id: int
-#
+class InspectionBase(BaseModel):
+    date: datetime.datetime
+    address: str | None = None
+    symptoms: str | None = None
+    instructions: str | None = None
+    doctor_id: int
+    patient_id: int
+
+
+class InspectionResponse(InspectionBase):
+
+    model_config = {"from_attributes": True}
+
+class InspectionResponseAdmin(InspectionResponse):
+    id: int
+
 # class InspectionCreate(InspectionBase):
 #     ...
 #
@@ -53,12 +53,18 @@ class InspectionCreateAdmin(BaseModel):
     patient_id: int
 
 class InspectionUpdateDoctor(BaseModel):
+    address: str | None = None
     symptoms: str | None = None
     instructions: str | None = None
     disease_ids: list[int] | None = None
-    prescriptions: list[PrescriptionItem] | None = None
+    prescriptions_create: list[PrescriptionItemCreate] | None = None
+    prescriptions_update: list[PrescriptionItemUpdate] | None = None
+    prescriptions_delete_ids: list[int] | None = None
 
-class PrescriptionItem(BaseModel):
+class PrescriptionItemCreate(BaseModel):
     medicine_id: int
     intake_method: str | None = None
-    side_effects: str | None = None
+
+class PrescriptionItemUpdate(BaseModel):
+    id: int
+    intake_method: str | None = None

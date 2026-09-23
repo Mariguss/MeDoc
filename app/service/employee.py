@@ -1,3 +1,5 @@
+from sqlalchemy.exc import IntegrityError
+
 from app.repository.employee import EmployeeRepository
 from app.service.base import BaseService
 

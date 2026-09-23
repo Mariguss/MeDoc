@@ -70,11 +70,32 @@ class BaseRepository(Generic[T]):
 
         return result.scalars().first()
 
+    async def exist(self, id_: int) -> bool:
+        stmt = select(self._model).where(self._model.id == id_)
+        result = await self.session.execute(stmt)
+        obj = result.scalars().first()
+        print("obj", obj)
+        if obj is not None:
+            return True
+        return False
+
+    async def all_exist(self, ids_: list[int]) -> bool:
+        for id_ in ids_:
+            if await self.exist(id_):
+                continue
+            else:
+                return False
+        return True
+
     async def create(self, schema: T) -> T:
         obj = self._model(**schema.model_dump(exclude_none=True))
         self.session.add(obj)
 
         return obj
+
+    async def create_all(self, objs: list[T]) -> None:
+        for obj in objs:
+            self.session.add(obj)
 
     async def update(self, id_: int, schema: T) -> T | None:
         stmt = select(self._model).where(self._model.id == id_)
@@ -90,6 +111,14 @@ class BaseRepository(Generic[T]):
 
         return obj
 
+    async def update_all(self, objs: list[T]) -> bool:
+        for obj in objs:
+            id_ = obj.id
+            flag = await self.update(id_, obj)
+            if flag is None:
+                return False
+        return True
+
     async def delete_by_id(self, id_: int) -> None:
         stmt = select(self._model).where(self._model.id == id_)
         result = await self.session.execute(stmt)
@@ -99,3 +128,8 @@ class BaseRepository(Generic[T]):
             raise NotFoundError(detail=f"Record with this id({id_}) does not exist.")
 
         await self.session.delete(obj)
+
+    async def delete_all_by_id(self, ids_: list[int]) -> None:
+        for id_ in ids_:
+            await self.delete_by_id(id_)
+
