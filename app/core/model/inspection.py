@@ -23,11 +23,10 @@ class Inspection(Base, IntIdPKMixin):
         DateTime(timezone=True),
         server_default=func.now(),
     )
-    address: Mapped[str]
-    symptoms: Mapped[str]
-    instructions: Mapped[str]
+    address: Mapped[str | None] = mapped_column(default="адрес больницы")
+    symptoms: Mapped[str | None]
+    instructions: Mapped[str | None]
 
-    # будут изменения?
     doctor_id: Mapped[int] = mapped_column(
         ForeignKey('employees.id', ondelete='RESTRICT'),
     )
