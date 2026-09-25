@@ -1,9 +1,14 @@
+import datetime
 from typing import TypeVar
 
 from sqlalchemy.exc import IntegrityError
 
-from app.core.exception import DuplicatedError, NotFoundError
-from app.core.model import Prescription, medicine
+from app.core.exception import (
+    DuplicatedError,
+    NotFoundError,
+)
+from app.core.model import Prescription
+from app.core.model.inspection import Status
 from app.repository.disease import DiseaseRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.inspection import InspectionRepository
@@ -123,3 +128,8 @@ class InspectionService:
         except Exception as e:
             await self._repository_inspection.session.rollback()
             raise e
+
+    async def inspection_per_day(self, status: str | None = Status.COMPLETED, start: datetime.date | None = None, end: datetime.date | None = None) -> T:
+        try:
+            data = await self._repository_inspection.get_inspection_count_by_day(status, start, end)
+            

@@ -9,11 +9,12 @@ from sqlalchemy.orm import (
 
 from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
+from app.core.model.mixin.created_at import CreatedAtMixin
 
 if TYPE_CHECKING:
     from app.core.model.inspection import Inspection
 
-class Disease(Base, IntIdPKMixin):
+class Disease(Base, IntIdPKMixin, CreatedAtMixin):
     name: Mapped[str] = mapped_column(String(50), unique=True)
 
     inspections: Mapped[list["Inspection"]] = relationship(

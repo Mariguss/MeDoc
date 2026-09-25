@@ -12,6 +12,8 @@ from sqlalchemy.orm import (
 
 from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
+from app.core.model.mixin.created_at import CreatedAtMixin
+from app.core.model.mixin.updated_at import UpdatedAtMixin
 
 if TYPE_CHECKING:
     ...
@@ -20,7 +22,7 @@ class Role(str, enum.Enum):
     DOCTOR = "doctor"
     ADMIN = "admin"
 
-class Employee(Base, IntIdPKMixin):
+class Employee(Base, IntIdPKMixin, CreatedAtMixin, UpdatedAtMixin):
     login: Mapped[str] = mapped_column(String(15), unique=True)
     password_hash:  Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(50))

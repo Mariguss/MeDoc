@@ -14,6 +14,8 @@ from sqlalchemy.orm import (
 
 from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
+from app.core.model.mixin.created_at import CreatedAtMixin
+from app.core.model.mixin.updated_at import UpdatedAtMixin
 
 if TYPE_CHECKING:
     ...
@@ -23,7 +25,7 @@ class Sex(str, enum.Enum):
     FEMALE = "f"
 
 # в будущем добавить паспортные данные или номер телефона
-class Patient(Base, IntIdPKMixin):
+class Patient(Base, IntIdPKMixin, CreatedAtMixin, UpdatedAtMixin):
     name: Mapped[str] = mapped_column(String(50))
     sex: Mapped[Sex] = mapped_column(
         Enum(Sex),
@@ -33,3 +35,4 @@ class Patient(Base, IntIdPKMixin):
         Date,
     )
     home_address: Mapped[str | None] = mapped_column(String(100))
+    phone_number: Mapped[str | None] = mapped_column(String(11))

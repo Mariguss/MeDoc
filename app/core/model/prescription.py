@@ -11,6 +11,7 @@ from sqlalchemy.orm import (
 
 from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
+from app.core.model.mixin.updated_at import UpdatedAtMixin
 
 if TYPE_CHECKING:
     ...
