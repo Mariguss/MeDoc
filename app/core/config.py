@@ -29,6 +29,14 @@ class DatabaseSettings(BaseModel):
         "pk": "pk_%(table_name)s",
     }
 
+class TokenSettings(BaseModel):
+    access_token_expire_seconds: int | None = 600
+    refresh_token_expire_seconds: int | None = 3600
+
+    secret_key: str | None = "SUPER_SECRET_KEY_ONLY_FOR_DEV_MODE"
+    DATETIME_FORMAT: str = "%Y-%m-%dT%H:%M:%S"
+    DATE_FORMAT: str = "%Y-%m-%d"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
