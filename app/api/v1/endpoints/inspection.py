@@ -7,7 +7,7 @@ from app.core.dependencies import get_inspection_service
 from app.core.schema.inspection import (
     InspectionResponseAdmin,
     InspectionCreateAdmin,
-    InspectionUpdateDoctor,
+    InspectionUpdateDoctor, InspectionPerDateRequest,
 )
 from app.service.inspection import InspectionService
 
@@ -82,3 +82,17 @@ async def update_inspection(
 #         service: InspectionService = Depends(get_inspection_service),
 # ):
 #     return await service.remove_by_id(id_)
+
+@router.get("/statistics/disease_per_patient/{id_}")
+async def get_inspection_statistics_disease_per_patient(
+        id_: int,
+        service: InspectionService = Depends(get_inspection_service),
+) -> int:
+    return await service.disease_per_patient(id_)
+
+@router.get("/statistics/inspection_per_date/")
+async def get_inspection_statistics_inspection_per_date(
+        schema: InspectionPerDateRequest,
+        service: InspectionService = Depends(get_inspection_service),
+) -> int:
+    return await service.inspection_per_day(schema)

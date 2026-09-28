@@ -83,3 +83,8 @@ class PrescriptionItemCreate(BaseModel):
 class PrescriptionItemUpdate(BaseModel):
     id: int
     intake_method: str | None = None
+
+class InspectionPerDateRequest(BaseModel):
+    status: Status | None = Status.COMPLETED
+    start_date: datetime.datetime | None = None
+    end_date: datetime.datetime | None = None

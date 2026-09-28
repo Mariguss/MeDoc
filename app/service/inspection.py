@@ -114,7 +114,7 @@ class InspectionService:
                         intake_method=p.intake_method,
                     )
                     for p in schema.prescriptions_create
-                ]
+
                 await self._repository_prescription.create_all(db_prescriptions)
 
             await self._repository_inspection.session.commit()
@@ -129,7 +129,26 @@ class InspectionService:
             await self._repository_inspection.session.rollback()
             raise e
 
-    async def inspection_per_day(self, status: str | None = Status.COMPLETED, start: datetime.date | None = None, end: datetime.date | None = None) -> T:
+    async def inspection_per_day(self, schema: T) -> list:
         try:
-            data = await self._repository_inspection.get_inspection_count_by_day(status, start, end)
-            
+            data = await self._repository_inspection.get_inspection_count_by_day(schema)
+            return data
+        except Exception as e:
+            print("inspection_per_day exception:", e)
+            raise e
+
+    async def diseases_per_patient(self, disease_ids_: list[int]) -> list:
+        try:
+            data = await self._repository_inspection.get_unique_patients_count_by_disease_ids(disease_ids_)
+            return data
+        except Exception as e:
+            print("diseases_per_patient exception:", e)
+            raise e
+
+    async def disease_per_patient(self, disease_id_: int) -> int:
+        try:
+            data = await self._repository_inspection.get_unique_patients_count_by_disease_id(disease_id_)
+            return data
+        except Exception as e:
+            print("diseases_per_patient exception:", e)
+            raise e
