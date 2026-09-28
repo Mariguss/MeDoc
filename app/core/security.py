@@ -11,7 +11,7 @@ from app.util.date import get_now
 ALGORITHM = "HS256"
 
 
-def create_access_token(subject: dict, expires_delta: timedelta | None = None) -> tuple[str, str]:
+def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta: timedelta | None = None) -> tuple[str, str]:
     now = get_now()
     if expires_delta:
         expire = now + expires_delta
@@ -20,26 +20,7 @@ def create_access_token(subject: dict, expires_delta: timedelta | None = None) -
 
     payload = {
         "exp": int(expire.timestamp()),
-        "type": "access",
-        **subject,
-    }
-
-    encoded_jwt = jwt.encode(payload, settings.secret_key, algorithm=ALGORITHM)
-    expiration_datetime = expire.strftime(settings.DATETIME_FORMAT)
-
-    return encoded_jwt, expiration_datetime
-
-def create_refresh_token(subject: dict, expires_delta: timedelta = None) -> tuple[str, str]:
-    now = get_now()
-
-    if expires_delta:
-        expire = now + expires_delta
-    else:
-        expire = now + timedelta(minutes=settings.refresh_token_expire_minutes)
-
-    payload = {
-        "exp": int(expire.timestamp()),
-        "type": "refresh",
+        "type": type_,
         **subject,
     }
 

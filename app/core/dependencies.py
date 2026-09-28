@@ -8,6 +8,7 @@ from app.repository.inspection import InspectionRepository
 from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.repository.prescription import PrescriptionRepository
+from app.service.auth import AuthService
 from app.service.employee import EmployeeService
 from app.service.inspection import InspectionService
 from app.service.medicine import MedicineService
@@ -81,3 +82,8 @@ async def get_inspection_service(
         repo_disease,
         repo_prescription,
     )
+
+async def get_auth_service(
+    repo: EmployeeRepository = Depends(get_employee_repository),
+) -> AuthService:
+    return AuthService(repo)
