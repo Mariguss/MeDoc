@@ -114,6 +114,7 @@ class InspectionService:
                         intake_method=p.intake_method,
                     )
                     for p in schema.prescriptions_create
+                ]
 
                 await self._repository_prescription.create_all(db_prescriptions)
 

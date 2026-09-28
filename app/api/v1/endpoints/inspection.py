@@ -90,9 +90,9 @@ async def get_inspection_statistics_disease_per_patient(
 ) -> int:
     return await service.disease_per_patient(id_)
 
-@router.get("/statistics/inspection_per_date/")
+@router.put("/statistics/inspection_per_date/")
 async def get_inspection_statistics_inspection_per_date(
         schema: InspectionPerDateRequest,
         service: InspectionService = Depends(get_inspection_service),
-) -> int:
+) -> list:
     return await service.inspection_per_day(schema)

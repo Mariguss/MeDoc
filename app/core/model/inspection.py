@@ -1,10 +1,11 @@
 import datetime
+import enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DateTime,
     func,
-    ForeignKey, Enum,
+    ForeignKey,
 )
 from sqlalchemy.orm import (
     Mapped,
@@ -14,13 +15,13 @@ from sqlalchemy.orm import (
 
 from app.core.model.base import Base
 from app.core.model.mixin import IntIdPKMixin
-from app.core.model.mixin.created_at import CreatedAtMixin
-from app.core.model.mixin.updated_at import UpdatedAtMixin
+from app.core.model.mixin import CreatedAtMixin
+from app.core.model.mixin import UpdatedAtMixin
 
 if TYPE_CHECKING:
     from app.core.model.disease import Disease
 
-class Status(str, Enum):
+class Status(str, enum.Enum):
     SCHEDULED = "scheduled"        # Запланирован — приём создан, ждём пациента
     COMPLETED = "completed"        # Завершён — осмотр окончен, заключение внесено
     CANCELLED = "cancelled"        # Отменён — приём отменён (пациент или врач)

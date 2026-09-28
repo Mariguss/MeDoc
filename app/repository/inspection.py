@@ -59,7 +59,7 @@ class InspectionRepository(BaseRepository):
         result = await self.session.execute(stmt)
 
         return [
-            {"date": row_.inspection_date.isoformat(), "count": row_.count}
+            {"date": row_.inspection_date, "count": row_.count}
             for row_ in result.all()
         ]
 

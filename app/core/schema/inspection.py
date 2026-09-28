@@ -50,7 +50,7 @@ class InspectionResponseAdmin(InspectionResponse):
 
 class InspectionCreateAdmin(BaseModel):
     date: datetime.datetime
-    address: str
+    address: str | None = "ул. Малая Семеновская д.13"
     doctor_id: int
     patient_id: int
     inspection_at: datetime.datetime | None = None
