@@ -48,6 +48,7 @@ class Settings(BaseSettings):
 
     run: RunSettings = RunSettings()
     db: DatabaseSettings = DatabaseSettings()
+    token: TokenSettings = TokenSettings()
 
 
 settings = Settings()

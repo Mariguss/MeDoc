@@ -3,7 +3,8 @@ from fastapi import (
     Depends,
 )
 
-from app.core.dependencies import get_inspection_service
+from app.core.dependencies import get_inspection_service, required_roles
+from app.core.model.employee import Role
 from app.core.schema.inspection import (
     InspectionResponseAdmin,
     InspectionCreateAdmin,
@@ -59,6 +60,7 @@ router = APIRouter(
 async def create_inspection(
         inspection: InspectionCreateAdmin,
         service: InspectionService = Depends(get_inspection_service),
+        _role: str = Depends(required_roles(["admin"])),
 ) -> InspectionResponseAdmin:
     return await service.add(inspection)
 
@@ -70,6 +72,7 @@ async def update_inspection(
         id_: int,
         inspection: InspectionUpdateDoctor,
         service: InspectionService = Depends(get_inspection_service),
+        _role: str = Depends(required_roles(["doctor"])),
 ):
     return await service.patch(id_, inspection)
 #

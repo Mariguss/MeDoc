@@ -16,7 +16,7 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
     if expires_delta:
         expire = now + expires_delta
     else:
-        expire = now + timedelta(minutes=settings.access_token_expire_minutes)
+        expire = now + timedelta(minutes=settings.token.access_token_expire_seconds)
 
     payload = {
         "exp": int(expire.timestamp()),
@@ -24,8 +24,8 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
         **subject,
     }
 
-    encoded_jwt = jwt.encode(payload, settings.secret_key, algorithm=ALGORITHM)
-    expiration_datetime = expire.strftime(settings.DATETIME_FORMAT)
+    encoded_jwt = jwt.encode(payload, settings.token.secret_key, algorithm=ALGORITHM)
+    expiration_datetime = expire.strftime(settings.token.DATETIME_FORMAT)
 
     return encoded_jwt, expiration_datetime
 
@@ -47,10 +47,11 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
 
 def decode_jwt(token: str) -> dict | None:
     try:
-        decoded_token = jwt.decode(token, settings.secret_key, algorithms=ALGORITHM)
+        decoded_token = jwt.decode(token, settings.token.secret_key, algorithms=ALGORITHM)
         return decoded_token if decoded_token["exp"] >= int(round(datetime.utcnow().timestamp())) else None
     except Exception as e:
-        return {}
+        print("decode_jwt", e)
+        raise e
 
 
 class JWTBearer(HTTPBearer):
@@ -59,28 +60,27 @@ class JWTBearer(HTTPBearer):
         # если клиент вообще забыл прикрепить токен
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
-    async def __call__(self, request: Request):
-
+    async def __call__(self, request: Request) -> dict | None:
         # Он идет в заголовки запроса и вытаскивает оттуда строчку "Authorization: Bearer <токен>"
         credentials_: HTTPAuthorizationCredentials | None = await super().__call__(request)
 
         if credentials_ is not None:
             if credentials_.scheme != "Bearer":
                 raise AuthError(detail="Invalid authentication scheme.")
-            if not self.verify_jwt(credentials_.credentials):
-                raise AuthError(detail="Invalid token or expired token.")
-            return credentials_.credentials
+            payload = self.verify_jwt(credentials_.credentials)
+            if payload.get("type") != "access":
+                raise AuthError(detail="Invalid token type.")
+            return payload
         else:
             raise AuthError(detail="Invalid authorization code.")
 
     @staticmethod
-    def verify_jwt(jwt_token: str) -> bool:
-        is_token_valid: bool = False
+    def verify_jwt(jwt_token: str) -> dict:
         try:
             payload = decode_jwt(jwt_token)
             if payload:
-                is_token_valid = True
-            return is_token_valid
+                return payload
+            raise AuthError(detail="Invalid token or expired token.")
         except Exception as e:
             print("verify_jwt", e)
             raise AuthError(detail="Invalid authorization code.")

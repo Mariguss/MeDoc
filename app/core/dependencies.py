@@ -1,7 +1,13 @@
+from typing import Callable
+
+from fastapi import HTTPException
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from app.core.database import database
+from app.core.security import JWTBearer
 from app.repository.disease import DiseaseRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.inspection import InspectionRepository
@@ -87,3 +93,29 @@ async def get_auth_service(
     repo: EmployeeRepository = Depends(get_employee_repository),
 ) -> AuthService:
     return AuthService(repo)
+
+auth_bearer = JWTBearer()
+
+def get_current_user(token_data: dict = Depends(auth_bearer)) -> dict:
+    return token_data
+
+def get_current_user_role(token_data: dict = Depends(auth_bearer)) -> str | None:
+    role_ = token_data.get("role")
+    print("роль из токена:", role_)
+    if role_ is None:
+        raise HTTPException(
+            detail="Роль пользователя не найдена",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+    return role_
+
+def required_roles(allowed_roles: list[str]) -> Callable:
+    def role_checker(role: str = Depends(get_current_user_role)):
+        print("role->", role, "allowed->", allowed_roles)
+        if role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="У вас нет прав для выполнения этого действия"
+            )
+        return role
+    return role_checker
