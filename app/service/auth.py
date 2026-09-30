@@ -46,7 +46,7 @@ class AuthService(BaseService):
         user_id = payload.get("sub")
         user_role = payload.get("role")
 
-        if not self._repository.exist(user_id):
+        if not await self._repository.exist(user_id):
             raise HTTPException(status.HTTP_403_FORBIDDEN)
 
         subject = {

@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 
-from fastapi import Request
+from fastapi import Request, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
+from starlette import status
 
 from app.core.config import settings
 from app.core.exception import AuthError
@@ -16,7 +17,7 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
     if expires_delta:
         expire = now + expires_delta
     else:
-        expire = now + timedelta(minutes=settings.token.access_token_expire_seconds)
+        expire = now + timedelta(seconds=settings.token.access_token_expire_seconds)
 
     payload = {
         "exp": int(expire.timestamp()),
@@ -48,7 +49,18 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
 def decode_jwt(token: str) -> dict | None:
     try:
         decoded_token = jwt.decode(token, settings.token.secret_key, algorithms=ALGORITHM)
+        print("decoded_token['exp']" ,decoded_token["exp"])
         return decoded_token if decoded_token["exp"] >= int(round(datetime.utcnow().timestamp())) else None
+    except jwt.exceptions.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Срок действия токена истек, пожалуйста, авторизуйтесь заново.",
+        )
+    except jwt.exceptions.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Невалидный токен авторизации.",
+        )
     except Exception as e:
         print("decode_jwt", e)
         raise e

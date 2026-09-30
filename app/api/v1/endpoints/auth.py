@@ -53,6 +53,10 @@ async def refresh(
             detail="Сессия истекла. Пожалуйста, авторизуйтесь заново",
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
-    new_access = await service.refresh(refresh_token)
+    new_access, new_expire = await service.refresh(refresh_token)
 
-    return {"access_token": new_access, "token_type": "bearer"}
+    return {
+        "access_token": new_access,
+        "token_type": "bearer",
+        "expires_at": new_expire,
+    }
