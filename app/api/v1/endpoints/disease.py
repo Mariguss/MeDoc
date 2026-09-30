@@ -4,7 +4,7 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.dependencies import get_disease_service, required_roles
+from app.core.dependencies import get_disease_service, auth_bearer
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.disease import (
     DiseaseResponse, DiseaseResponseAdmin, DiseaseCreate, DiseaseUpdate,
@@ -14,7 +14,7 @@ from app.service.disease import DiseaseService
 router = APIRouter(
     prefix="/disease",
     tags=["disease", "administration"],
-    dependencies=[Depends(required_roles(["admin"]))],
+    dependencies=[Depends(auth_bearer)],
 )
 
 
