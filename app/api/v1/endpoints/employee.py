@@ -4,7 +4,7 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.dependencies import get_employee_service
+from app.core.dependencies import get_employee_service, required_roles
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.employee import (
     EmployeeResponseAdmin,
@@ -16,7 +16,8 @@ from app.service.employee import EmployeeService
 
 router = APIRouter(
     prefix="/employee",
-    tags=["employee"],
+    tags=["employee", "administration"],
+    dependencies=[Depends(required_roles(["admin"]))],
 )
 
 @router.get(

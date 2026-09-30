@@ -4,7 +4,7 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.dependencies import get_medicine_service
+from app.core.dependencies import get_medicine_service, required_roles
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.medicine import (
     MedicineResponse,
@@ -16,7 +16,8 @@ from app.service.medicine import MedicineService
 
 router = APIRouter(
     prefix="/medicine",
-    tags=["medicine"],
+    tags=["medicine", "administration"],
+    dependencies=[Depends(required_roles(["admin"]))],
 )
 
 
@@ -56,10 +57,10 @@ async def get_medicine(
     status_code=201,
 )
 async def create_medicine(
-        employee: MedicineCreate,
+        medicine: MedicineCreate,
         service: MedicineService = Depends(get_medicine_service),
 ) -> MedicineResponseAdmin:
-    return await service.add(employee)
+    return await service.add(medicine)
 
 @router.patch(
     "/{id_}",
@@ -67,10 +68,10 @@ async def create_medicine(
 )
 async def update_medicine(
         id_: int,
-        employee: MedicineUpdate,
+        medicine: MedicineUpdate,
         service: MedicineService = Depends(get_medicine_service),
 ):
-    return await service.patch(id_, employee)
+    return await service.patch(id_, medicine)
 
 @router.delete(
     "/{id_}",

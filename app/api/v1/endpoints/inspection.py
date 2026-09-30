@@ -3,7 +3,7 @@ from fastapi import (
     Depends,
 )
 
-from app.core.dependencies import get_inspection_service, required_roles
+from app.core.dependencies import get_inspection_service, required_roles, auth_bearer
 from app.core.model.employee import Role
 from app.core.schema.inspection import (
     InspectionResponseAdmin,
@@ -15,6 +15,7 @@ from app.service.inspection import InspectionService
 router = APIRouter(
     prefix="/inspection",
     tags=["inspection"],
+    dependencies=[Depends(auth_bearer)],
 )
 
 #

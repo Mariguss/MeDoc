@@ -4,7 +4,10 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.dependencies import get_patient_service
+from app.core.dependencies import (
+    get_patient_service,
+    auth_bearer,
+)
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.patient import (
     PatientResponse,
@@ -17,6 +20,7 @@ from app.service.patient import PatientService
 router = APIRouter(
     prefix="/patient",
     tags=["patient"],
+    dependencies=[Depends(auth_bearer)],
 )
 
 
