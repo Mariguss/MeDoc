@@ -15,6 +15,7 @@ from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.repository.prescription import PrescriptionRepository
 from app.service.auth import AuthService
+from app.service.disease import DiseaseService
 from app.service.employee import EmployeeService
 from app.service.inspection import InspectionService
 from app.service.medicine import MedicineService
@@ -56,7 +57,6 @@ async def get_medicine_service(
 ) -> MedicineService:
     return MedicineService(repo)
 
-
 async def get_inspection_repository(
     session: AsyncSession = Depends(database.get_session),
 ) -> InspectionRepository:
@@ -66,6 +66,11 @@ async def get_disease_repository(
         session: AsyncSession = Depends(database.get_session),
 ) -> DiseaseRepository:
     return DiseaseRepository(session)
+
+async def get_disease_service(
+        repo: DiseaseRepository = Depends(get_disease_repository)
+) -> DiseaseService:
+    return DiseaseService(repo)
 
 async def get_prescription_repository(
         session: AsyncSession = Depends(database.get_session),
