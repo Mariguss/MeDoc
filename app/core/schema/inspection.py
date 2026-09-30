@@ -19,12 +19,21 @@ class InspectionBase(BaseModel):
     doctor_id: int
     patient_id: int
 
-class InspectionResponse(InspectionBase):
-
+class InspectionResponse(BaseModel):
+    inspection_at: datetime.datetime
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    address: str | None = None
+    doctor_id: int
+    patient_id: int
     model_config = {"from_attributes": True}
 
 class InspectionResponseAdmin(InspectionResponse):
     id: int
+
+class InspectionResponseDoctor(InspectionResponseAdmin):
+    symptoms: str | None = None
+    instructions: str | None = None
 
 # class InspectionQuery(BaseQuery):
 #     date: datetime.datetime | None = None
@@ -58,14 +67,14 @@ class InspectionCreateDoctor(BaseModel):
     instructions: str | None = None
     disease_ids: list[int] | None = None
     prescriptions_create: list[PrescriptionCreate] | None = None
-    prescriptions_update: list[PrescriptionUpdate] | None = None
-    prescriptions_delete_ids: list[int] | None = None
     status: Status | None = Status.COMPLETED
 
 class InspectionUpdateDoctor(InspectionCreateDoctor):
     patient_id: int | None = None
     address: str | None = None
     status: Status | None = None
+    prescriptions_update: list[PrescriptionUpdate] | None = None
+    prescriptions_delete_ids: list[int] | None = None
 
 class InspectionPerDateRequest(BaseModel):
     status: Status | None = Status.COMPLETED
