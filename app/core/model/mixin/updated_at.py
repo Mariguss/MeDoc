@@ -11,4 +11,9 @@ from app.util.date import get_now
 
 
 class UpdatedAtMixin:
-    updated_at: Mapped[datetime.datetime | None] = mapped_column(DateTime, default=get_now(), server_default=func.now())
+    updated_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime,
+        default=get_now,
+        server_default=func.now(),
+        onupdate=get_now,
+    )

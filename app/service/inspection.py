@@ -1,4 +1,3 @@
-import datetime
 from typing import TypeVar
 
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +7,6 @@ from app.core.exception import (
     NotFoundError,
 )
 from app.core.model import Prescription
-from app.core.model.inspection import Status
 from app.repository.disease import DiseaseRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.inspection import InspectionRepository
@@ -35,9 +33,32 @@ class InspectionService:
         self._repository_prescription = repository_prescription
 
 
-    async def add(self, schema: T) -> R:
+    async def add_by_admin(self, schema: T) -> R:
         try:
             employee_ = await self._repository_employee.exist(schema.doctor_id)
+            if not employee_:
+                raise NotFoundError(
+                    detail="Employee не найден"
+                )
+            patient_ = await self._repository_patient.exist(schema.patient_id)
+            if not patient_:
+                raise NotFoundError(
+                    detail="Пациент не найден"
+                )
+
+            obj = await self._repository_inspection.create(schema)
+            await self._repository_inspection.session.commit()
+            await self._repository_inspection.session.refresh(obj)
+            return obj
+        except IntegrityError:
+            await self._repository_inspection.session.rollback()
+            raise DuplicatedError(
+                detail="Запись с такими уникальными атрибутами уже существует."
+            )
+
+    async def add_by_doctor(self, doctor_id, schema: T) -> R:
+        try:
+            employee_ = await self._repository_employee.exist(doctor_id)
             if not employee_:
                 raise NotFoundError(
                     detail="Employee не найден"
