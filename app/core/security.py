@@ -50,7 +50,7 @@ def decode_jwt(token: str) -> dict | None:
     try:
         decoded_token = jwt.decode(token, settings.token.secret_key, algorithms=ALGORITHM)
         print("decoded_token['exp']" ,decoded_token["exp"])
-        return decoded_token if decoded_token["exp"] >= int(round(datetime.utcnow().timestamp())) else None
+        return decoded_token if decoded_token["exp"] >= int(round(get_now().timestamp())) else None
     except jwt.exceptions.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

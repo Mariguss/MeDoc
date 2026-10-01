@@ -104,6 +104,16 @@ auth_bearer = JWTBearer()
 def get_current_user(token_data: dict = Depends(auth_bearer)) -> dict:
     return token_data
 
+def get_current_user_id(token_data: dict = Depends(auth_bearer)) -> int | None:
+    id_ = token_data.get("sub")
+    print("id",id_)
+    if id_ is None:
+        raise HTTPException(
+            detail="ID пользователя не найден",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+    return id_
+
 def get_current_user_role(token_data: dict = Depends(auth_bearer)) -> str | None:
     role_ = token_data.get("role")
     print("роль из токена:", role_)

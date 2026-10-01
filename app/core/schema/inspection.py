@@ -3,6 +3,7 @@ import datetime
 from pydantic import (
     BaseModel,
 )
+from pydantic.json_schema import SkipJsonSchema
 
 from app.core.model.inspection import Status
 from app.core.schema.prescription import (
@@ -12,7 +13,6 @@ from app.core.schema.prescription import (
 
 
 class InspectionBase(BaseModel):
-    date: datetime.datetime
     address: str | None = None
     symptoms: str | None = None
     instructions: str | None = None
@@ -20,7 +20,7 @@ class InspectionBase(BaseModel):
     patient_id: int
 
 class InspectionResponse(BaseModel):
-    inspection_at: datetime.datetime
+    inspection_at: datetime.datetime | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime
     address: str | None = None
@@ -46,7 +46,6 @@ class InspectionResponseDoctor(InspectionResponseAdmin):
 
 
 class InspectionCreateAdmin(BaseModel):
-    date: datetime.datetime
     address: str | None = "ул. Малая Семеновская д.13"
     doctor_id: int
     patient_id: int
@@ -54,7 +53,6 @@ class InspectionCreateAdmin(BaseModel):
 
 # по записи, но осмотра не было
 class InspectionUpdateAdmin(InspectionCreateAdmin):
-    date: datetime.datetime | None = None
     doctor_id: int | None = None
     patient_id: int | None = None
     address: str | None = None
@@ -68,6 +66,11 @@ class InspectionCreateDoctor(BaseModel):
     disease_ids: list[int] | None = None
     prescriptions_create: list[PrescriptionCreate] | None = None
     status: Status | None = Status.COMPLETED
+    inspection_at: datetime.datetime | None = None
+
+
+class InspectionCreateDoctorInternal(InspectionCreateDoctor):
+    doctor_id: int
 
 class InspectionUpdateDoctor(InspectionCreateDoctor):
     patient_id: int | None = None
@@ -75,6 +78,7 @@ class InspectionUpdateDoctor(InspectionCreateDoctor):
     status: Status | None = None
     prescriptions_update: list[PrescriptionUpdate] | None = None
     prescriptions_delete_ids: list[int] | None = None
+    inspection_at: datetime.datetime | None = None
 
 class InspectionPerDateRequest(BaseModel):
     status: Status | None = Status.COMPLETED

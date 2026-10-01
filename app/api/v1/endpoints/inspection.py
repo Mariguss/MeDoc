@@ -3,13 +3,20 @@ from fastapi import (
     Depends,
 )
 
-from app.core.dependencies import get_inspection_service, required_roles, auth_bearer, get_current_user
-from app.core.model.employee import Role
+from app.core.dependencies import (
+    get_inspection_service,
+    required_roles,
+    auth_bearer,
+    get_current_user_id,
+)
 from app.core.schema.inspection import (
     InspectionResponseAdmin,
     InspectionCreateAdmin,
-    InspectionUpdateDoctor, InspectionPerDateRequest, InspectionCreateDoctor, InspectionResponseDoctor,
-    InspectionUpdateAdmin,
+    InspectionUpdateDoctor,
+    InspectionPerDateRequest,
+    InspectionCreateDoctor,
+    InspectionResponseDoctor,
+    InspectionUpdateAdmin, InspectionCreateDoctorInternal,
 )
 from app.service.inspection import InspectionService
 
@@ -74,13 +81,15 @@ async def create_inspection_by_admin(
 async def create_inspection_by_doctor(
         inspection: InspectionCreateDoctor,
         service: InspectionService = Depends(get_inspection_service),
+        doctor_id: int = Depends(get_current_user_id),
         _role: str = Depends(required_roles(["doctor"])),
 ) -> InspectionResponseDoctor:
-    doctor_id_ = get_current_user().get("id")
-    return await service.add_by_doctor(doctor_id_, inspection)
+    print("doctor_id in api", doctor_id)
+    data = InspectionCreateDoctorInternal(**inspection.model_dump(), doctor_id=doctor_id)
+    return await service.add_by_doctor(data)
 
 @router.patch(
-    "/{id_}",
+    "/admin/{id_}",
     response_model=InspectionResponseAdmin,
 )
 async def update_inspection_by_admin(
@@ -92,7 +101,7 @@ async def update_inspection_by_admin(
     return await service.patch_by_admin(id_, inspection)
 
 @router.patch(
-    "/{id_}",
+    "/doctor/{id_}",
     response_model=InspectionResponseDoctor,
 )
 async def update_inspection_by_doctor(
