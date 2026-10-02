@@ -11,9 +11,7 @@ from app.core.model.base import BaseWithId
 
 
 class InspectionDisease(BaseWithId):
-    __table_args__ = (
-        UniqueConstraint("inspection_id", "disease_id"),
-    )
+    __table_args__ = (UniqueConstraint("inspection_id", "disease_id"),)
     inspection_id: Mapped[int] = mapped_column(
         ForeignKey("inspections.id", ondelete="CASCADE"),
     )

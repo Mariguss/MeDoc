@@ -13,10 +13,11 @@ from app.core.model.inspection import Inspection, Status
 
 T = TypeVar("T")
 
+
 class InspectionRepository:
     def __init__(
-            self,
-            session: AsyncSession,
+        self,
+        session: AsyncSession,
     ) -> None:
         self.session = session
         self._model = Inspection
@@ -37,8 +38,9 @@ class InspectionRepository:
 
     async def update_diseases(self, inspection_id: int, disease_ids: list[int]) -> None:
         await self.session.execute(
-            delete(InspectionDisease)
-            .where(InspectionDisease.inspection_id == inspection_id)
+            delete(InspectionDisease).where(
+                InspectionDisease.inspection_id == inspection_id
+            )
         )
 
         for d_id in disease_ids:
@@ -49,18 +51,15 @@ class InspectionRepository:
             self.session.add(link)
 
     async def get_inspection_count_by_day(
-            self, status_: Status | None = Status.COMPLETED,
-            start_date_: datetime.datetime | None = None,
-            end_date_: datetime.datetime | None = None) -> list:
+        self,
+        status_: Status | None = Status.COMPLETED,
+        start_date_: datetime.datetime | None = None,
+        end_date_: datetime.datetime | None = None,
+    ) -> list:
 
         date_label = func.date(Inspection.inspection_at).label("inspection_date")
 
-        stmt = (
-            select(
-                date_label,
-                func.count(Inspection.status).label("count")
-            )
-        )
+        stmt = select(date_label, func.count(Inspection.status).label("count"))
 
         if status_ is not None:
             stmt = stmt.where(Inspection.status == status_)
@@ -74,8 +73,7 @@ class InspectionRepository:
         result = await self.session.execute(stmt)
 
         return [
-            {"date": row_.inspection_date, "count": row_.count}
-            for row_ in result.all()
+            {"date": row_.inspection_date, "count": row_.count} for row_ in result.all()
         ]
 
     async def get_unique_patients_count_by_disease_id(self, disease_id_: int) -> int:
@@ -95,7 +93,9 @@ class InspectionRepository:
 
         return result.scalar() or 0
 
-    async def get_unique_patients_count_by_disease_ids(self, disease_ids_: list[int]) -> list:
+    async def get_unique_patients_count_by_disease_ids(
+        self, disease_ids_: list[int]
+    ) -> list:
         distinct_patients = func.distinct(Inspection.patient_id)
         patients_count = func.count(distinct_patients).label("unique_patients_count")
 
@@ -104,7 +104,6 @@ class InspectionRepository:
                 Disease.id.label("disease_id"),
                 Disease.name.label("disease_name"),
                 patients_count,
-
             )
             .join(
                 InspectionDisease,
@@ -117,9 +116,7 @@ class InspectionRepository:
         )
 
         if disease_ids_ is not None:
-            stmt = stmt.where(
-                InspectionDisease.disease_id.in_(disease_ids_)
-            )
+            stmt = stmt.where(InspectionDisease.disease_id.in_(disease_ids_))
 
         stmt = stmt.group_by(Disease.id, Disease.name).order_by(patients_count.desc())
 

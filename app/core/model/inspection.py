@@ -20,11 +20,12 @@ from app.core.model.mixin import UpdatedAtMixin
 if TYPE_CHECKING:
     from app.core.model.disease import Disease
 
+
 class Status(str, enum.Enum):
-    SCHEDULED = "scheduled"        # Запланирован — приём создан, ждём пациента
-    COMPLETED = "completed"        # Завершён — осмотр окончен, заключение внесено
-    CANCELLED = "cancelled"        # Отменён — приём отменён (пациент или врач)
-    NO_SHOW = "no_show"            # Неявка — пациент не пришёл на запланированный приём
+    SCHEDULED = "scheduled"  # Запланирован — приём создан, ждём пациента
+    COMPLETED = "completed"  # Завершён — осмотр окончен, заключение внесено
+    CANCELLED = "cancelled"  # Отменён — приём отменён (пациент или врач)
+    NO_SHOW = "no_show"  # Неявка — пациент не пришёл на запланированный приём
 
 
 class Inspection(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
@@ -37,10 +38,10 @@ class Inspection(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
     instructions: Mapped[str | None]
 
     doctor_id: Mapped[int] = mapped_column(
-        ForeignKey('employees.id', ondelete='RESTRICT'),
+        ForeignKey("employees.id", ondelete="RESTRICT"),
     )
     patient_id: Mapped[int] = mapped_column(
-        ForeignKey('patients.id', ondelete='RESTRICT'),
+        ForeignKey("patients.id", ondelete="RESTRICT"),
     )
 
     status: Mapped[Status | None] = mapped_column(default=Status.SCHEDULED)

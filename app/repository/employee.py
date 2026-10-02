@@ -7,8 +7,8 @@ from app.repository.base import BaseRepository
 
 class EmployeeRepository(BaseRepository[Employee]):
     def __init__(
-            self,
-            session: AsyncSession,
+        self,
+        session: AsyncSession,
     ) -> None:
         super().__init__(session, Employee)
 

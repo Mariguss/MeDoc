@@ -15,13 +15,14 @@ from app.core.model.mixin.updated_at import UpdatedAtMixin
 if TYPE_CHECKING:
     ...
 
+
 class Prescription(BaseWithId, UpdatedAtMixin):
     __table_args__ = (
         UniqueConstraint(
-            'inspection_id',
-            'medicine_id',
-            'intake_method',
-            name='idx_unique_inspection_medicine_intake'
+            "inspection_id",
+            "medicine_id",
+            "intake_method",
+            name="idx_unique_inspection_medicine_intake",
         ),
     )
     inspection_id: Mapped[int] = mapped_column(

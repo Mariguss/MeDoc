@@ -6,7 +6,7 @@ from app.repository.base import BaseRepository
 
 class MedicineRepository(BaseRepository[Medicine]):
     def __init__(
-            self,
-            session: AsyncSession,
+        self,
+        session: AsyncSession,
     ) -> None:
         super().__init__(session, Medicine)

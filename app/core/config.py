@@ -14,6 +14,7 @@ class RunSettings(BaseModel):
     host: str = "127.0.0.5"
     port: int = 8005
 
+
 class DatabaseSettings(BaseModel):
     url: str = f"sqlite+aiosqlite:///{SQLITE_DB_PATH}"
     db_name: str | None = None
@@ -29,9 +30,10 @@ class DatabaseSettings(BaseModel):
         "pk": "pk_%(table_name)s",
     }
 
+
 class TokenSettings(BaseModel):
-    access_token_expire_seconds: float  = 60 * 10
-    refresh_token_expire_seconds: float  = 60 * 60
+    access_token_expire_seconds: float = 60 * 10
+    refresh_token_expire_seconds: float = 60 * 60
 
     secret_key: str | None = "SUPER_SECRET_KEY_ONLY_FOR_DEV_MODE"
     DATETIME_FORMAT: str = "%Y-%m-%dT%H:%M:%S"

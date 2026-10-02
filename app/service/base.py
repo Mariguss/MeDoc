@@ -1,7 +1,9 @@
 # Для написания бизнес-логики (слой между repository и routes)
 from typing import (
     Generic,
-    TypeVar, cast, Any,
+    TypeVar,
+    cast,
+    Any,
 )
 
 from pydantic import BaseModel
@@ -19,8 +21,8 @@ DTOIn = TypeVar("DTOIn", bound=BaseModel)
 DTOOut = TypeVar("DTOOut", bound=BaseModel)
 ModelT = TypeVar("ModelT", bound=Base)
 
-class BaseService(Generic[DTOIn, DTOOut]):
 
+class BaseService(Generic[DTOIn, DTOOut]):
     def __init__(self, repository, model_class: type[Base]) -> None:
         self._repository = repository
         self._model_class = model_class
@@ -31,9 +33,7 @@ class BaseService(Generic[DTOIn, DTOOut]):
     async def get_by_id(self, id_: int) -> DTOOut:
         obj = await self._repository.read_by_id(id_)
         if obj is None:
-            raise NotFoundError(
-                detail=f"Запись с ID {id_} не найдена."
-            )
+            raise NotFoundError(detail=f"Запись с ID {id_} не найдена.")
         return cast(DTOOut, cast(Any, obj))
 
     async def add(self, schema: DTOIn) -> DTOOut:
@@ -54,9 +54,7 @@ class BaseService(Generic[DTOIn, DTOOut]):
         try:
             obj = await self._repository.read_by_id(id_)
             if obj is None:
-                raise NotFoundError(
-                    detail=f"Запись с ID {id_} не найдена."
-                )
+                raise NotFoundError(detail=f"Запись с ID {id_} не найдена.")
             update_data = schema.model_dump(exclude_unset=True)
             for key, value in update_data.items():
                 setattr(obj, key, value)

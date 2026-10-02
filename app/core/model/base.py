@@ -17,5 +17,6 @@ class Base(DeclarativeBase):
         naming_convention=settings.db.naming_convention,
     )
 
+
 class BaseWithId(Base, IntIdPKMixin):
     __abstract__ = True

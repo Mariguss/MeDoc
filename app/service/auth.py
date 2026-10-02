@@ -13,7 +13,7 @@ from app.service.base import BaseService
 from app.util.hashing import verify_password
 
 
-class AuthService():
+class AuthService:
     def __init__(self, repository: EmployeeRepository):
         self._repository = repository
 
@@ -21,11 +21,11 @@ class AuthService():
         try:
             obj = await self._repository.get_by_login(schema.login)
             if obj is None:
-                raise NotFoundError(
-                    detail=f"Запись с login {schema.login} не найдена."
-                )
+                raise NotFoundError(detail=f"Запись с login {schema.login} не найдена.")
             if not verify_password(schema.password, obj.password_hash):
-                raise HTTPException(status.HTTP_401_UNAUTHORIZED) # смешение api и service логики?!!!
+                raise HTTPException(
+                    status.HTTP_401_UNAUTHORIZED
+                )  # смешение api и service логики?!!!
 
             subject = {"sub": str(obj.id), "role": str(obj.role.value)}
             access_token_, expire_at = create_jwt_token(subject)

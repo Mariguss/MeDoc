@@ -13,20 +13,22 @@ class MedicineBase(BaseModel):
     properties: str
     side_effects: str
 
-class MedicineResponse(MedicineBase):
 
+class MedicineResponse(MedicineBase):
     model_config = {"from_attributes": True}
+
 
 class MedicineResponseAdmin(MedicineResponse):
     id: int
 
-class MedicineCreate(MedicineBase):
-    ...
+
+class MedicineCreate(MedicineBase): ...
+
 
 class MedicineUpdate(BaseModel):
     name: Annotated[str | None, Field(min_length=1, max_length=50)] = None
     properties: str | None = None
     side_effects: str | None = None
 
-class MedicineQuery(BaseQuery, MedicineBase):
-    ...
+
+class MedicineQuery(BaseQuery, MedicineBase): ...

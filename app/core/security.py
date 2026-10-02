@@ -13,13 +13,16 @@ from app.util.date import get_now
 ALGORITHM = "HS256"
 
 
-def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta: timedelta | None = None) -> tuple[str, str]:
+def create_jwt_token(
+    subject: dict, type_: str | None = "access", expires_delta: timedelta | None = None
+) -> tuple[str, str]:
     now = get_now()
     if expires_delta:
         expire = now + expires_delta
     else:
         expires_seconds: float = (
-            settings.token.access_token_expire_seconds if type_ == "access"
+            settings.token.access_token_expire_seconds
+            if type_ == "access"
             else settings.token.refresh_token_expire_seconds
         )
         expire = now + timedelta(seconds=expires_seconds)
@@ -34,6 +37,7 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
     expiration_datetime = expire.strftime(settings.token.DATETIME_FORMAT)
 
     return encoded_jwt, expiration_datetime
+
 
 # def verify_password(plain_password: str, hashed_password: str) -> bool:
 #     try:
@@ -53,9 +57,15 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
 
 def decode_jwt(token: str) -> dict | None:
     try:
-        decoded_token = jwt.decode(token, settings.token.secret_key, algorithms=ALGORITHM)
-        print("decoded_token['exp']" ,decoded_token["exp"])
-        return decoded_token if decoded_token["exp"] >= int(round(get_now().timestamp())) else None
+        decoded_token = jwt.decode(
+            token, settings.token.secret_key, algorithms=ALGORITHM
+        )
+        print("decoded_token['exp']", decoded_token["exp"])
+        return (
+            decoded_token
+            if decoded_token["exp"] >= int(round(get_now().timestamp()))
+            else None
+        )
     except jwt.exceptions.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -73,13 +83,15 @@ def decode_jwt(token: str) -> dict | None:
 
 class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
-        # auto_error=True заставляет FastAPI автоматически выкидывать ошибку, 
+        # auto_error=True заставляет FastAPI автоматически выкидывать ошибку,
         # если клиент вообще забыл прикрепить токен
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> Any:
         # Он идет в заголовки запроса и вытаскивает оттуда строчку "Authorization: Bearer <токен>"
-        credentials_: HTTPAuthorizationCredentials | None = await super().__call__(request)
+        credentials_: HTTPAuthorizationCredentials | None = await super().__call__(
+            request
+        )
 
         if credentials_ is not None:
             if credentials_.scheme != "Bearer":

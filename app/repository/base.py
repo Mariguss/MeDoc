@@ -15,12 +15,12 @@ from app.repository.interface import ReadResult
 
 ModelT = TypeVar("ModelT", bound=BaseWithId)
 
-class BaseRepository(Generic[ModelT]):
 
+class BaseRepository(Generic[ModelT]):
     def __init__(
-            self,
-            session: AsyncSession,
-            model: type[ModelT],
+        self,
+        session: AsyncSession,
+        model: type[ModelT],
     ) -> None:
         self.session = session
         self._model = model
@@ -40,11 +40,11 @@ class BaseRepository(Generic[ModelT]):
         return stmt
 
     async def read_by_options(
-            self,
-            page: int = 1,
-            page_size: int = 10,
-            ordering: str = "-id",
-            **kwargs,
+        self,
+        page: int = 1,
+        page_size: int = 10,
+        ordering: str = "-id",
+        **kwargs,
     ) -> ReadResult[ModelT]:
         stmt = select(self._model)
         stmt = self._build_stmt_with_filters(stmt, **kwargs)

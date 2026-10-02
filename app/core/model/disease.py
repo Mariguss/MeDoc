@@ -13,6 +13,7 @@ from app.core.model.mixin.created_at import CreatedAtMixin
 if TYPE_CHECKING:
     from app.core.model.inspection import Inspection
 
+
 class Disease(BaseWithId, CreatedAtMixin):
     name: Mapped[str] = mapped_column(String(50), unique=True)
 

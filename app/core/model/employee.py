@@ -17,13 +17,15 @@ from app.core.model.mixin.updated_at import UpdatedAtMixin
 if TYPE_CHECKING:
     ...
 
+
 class Role(str, enum.Enum):
     DOCTOR = "doctor"
     ADMIN = "admin"
 
+
 class Employee(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
     login: Mapped[str] = mapped_column(String(15), unique=True)
-    password_hash:  Mapped[str] = mapped_column(String(255))
+    password_hash: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(50))
     role: Mapped[Role] = mapped_column(
         Enum(Role),

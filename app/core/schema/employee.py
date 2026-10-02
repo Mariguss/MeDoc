@@ -25,6 +25,7 @@ class EmployeeBase(BaseModel):
             raise ValueError("Логин может содержать только латиницу, цифры и _")
         return v
 
+
 class EmployeeResponse(BaseModel):
     login: str
     name: str
@@ -32,9 +33,11 @@ class EmployeeResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
 class EmployeeResponseAdmin(EmployeeResponse):
     id: int
     role: Role
+
 
 class EmployeeCreate(EmployeeBase):
     password_hash: Annotated[str, Field(alias="password", min_length=8, max_length=128)]
@@ -52,14 +55,17 @@ class EmployeeCreate(EmployeeBase):
             raise ValueError("Пароль должен содержать спецсимвол")
         return get_password_hash(v)
 
+
 class EmployeeUpdate(EmployeeBase):
     role: Role | None = None
     speciality: Annotated[str | None, Field(min_length=1, max_length=50)] = None
+
 
 class EmployeeQuery(BaseQuery):
     login: str | None = None
     name: str | None = None
     speciality: str | None = None
+
 
 class EmployeeQueryAdmin(EmployeeQuery):
     role: Role | None = None

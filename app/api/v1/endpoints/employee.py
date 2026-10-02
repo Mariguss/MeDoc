@@ -20,35 +20,39 @@ router = APIRouter(
     dependencies=[Depends(required_roles(["admin"]))],
 )
 
+
 @router.get(
     "/",
     response_model=PaginatedResponse[EmployeeResponse],
     status_code=200,
 )
 async def get_employees(
-        service: EmployeeService = Depends(get_employee_service),
-        page: int = 1,
-        page_size: int = 10,
-        ordering: str = "-id",
+    service: EmployeeService = Depends(get_employee_service),
+    page: int = 1,
+    page_size: int = 10,
+    ordering: str = "-id",
 ):
     return await service.get_list(
         page=page,
         page_size=page_size,
         ordering=ordering,
     )
+
+
 @router.get(
     "/{id_}",
     response_model=EmployeeResponseAdmin,
     status_code=200,
 )
 async def get_employee(
-        id_: int,
-        service: EmployeeService = Depends(get_employee_service),
+    id_: int,
+    service: EmployeeService = Depends(get_employee_service),
 ):
     employee = await service.get_by_id(id_)
     if employee is None:
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
     return employee
+
 
 @router.post(
     "/",
@@ -56,28 +60,30 @@ async def get_employee(
     status_code=201,
 )
 async def create_employee(
-        employee: EmployeeCreate,
-        service: EmployeeService = Depends(get_employee_service),
+    employee: EmployeeCreate,
+    service: EmployeeService = Depends(get_employee_service),
 ) -> EmployeeResponseAdmin:
     return await service.add(employee)
+
 
 @router.patch(
     "/{id_}",
     response_model=EmployeeResponseAdmin,
 )
 async def update_employee(
-        id_: int,
-        employee: EmployeeUpdate,
-        service: EmployeeService = Depends(get_employee_service),
+    id_: int,
+    employee: EmployeeUpdate,
+    service: EmployeeService = Depends(get_employee_service),
 ):
     return await service.patch(id_, employee)
+
 
 @router.delete(
     "/{id_}",
     status_code=204,
 )
 async def delete_employee(
-        id_: int,
-        service: EmployeeService = Depends(get_employee_service),
+    id_: int,
+    service: EmployeeService = Depends(get_employee_service),
 ):
     return await service.remove_by_id(id_)

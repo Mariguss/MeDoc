@@ -19,9 +19,11 @@ from app.core.model.mixin.updated_at import UpdatedAtMixin
 if TYPE_CHECKING:
     ...
 
+
 class Sex(str, enum.Enum):
     MALE = "m"
     FEMALE = "f"
+
 
 # в будущем добавить паспортные данные или номер телефона
 class Patient(BaseWithId, CreatedAtMixin, UpdatedAtMixin):

@@ -19,6 +19,7 @@ class InspectionBase(BaseModel):
     patient_id: int
     inspection_at: datetime.datetime | None = None
 
+
 class InspectionResponse(BaseModel):
     inspection_at: datetime.datetime | None = None
     created_at: datetime.datetime
@@ -28,12 +29,15 @@ class InspectionResponse(BaseModel):
     patient_id: int
     model_config = {"from_attributes": True}
 
+
 class InspectionResponseAdmin(InspectionResponse):
     id: int
+
 
 class InspectionResponseDoctor(InspectionResponseAdmin):
     symptoms: str | None = None
     instructions: str | None = None
+
 
 # class InspectionQuery(BaseQuery):
 #     date: datetime.datetime | None = None
@@ -51,12 +55,14 @@ class InspectionCreateAdmin(BaseModel):
     patient_id: int
     inspection_at: datetime.datetime | None = None
 
+
 # по записи, но осмотра не было
 class InspectionUpdateAdmin(BaseModel):
     doctor_id: int | None = None
     patient_id: int | None = None
     address: str | None = None
     inspection_at: datetime.datetime | None = None
+
 
 # добавить для осмотра без записи. в порядке очереди
 class InspectionCreateDoctor(BaseModel):
@@ -73,6 +79,7 @@ class InspectionCreateDoctor(BaseModel):
 class InspectionCreateDoctorInternal(InspectionCreateDoctor):
     doctor_id: int
 
+
 class InspectionUpdateDoctor(BaseModel):
     patient_id: int | None = None
     address: str | None = None
@@ -84,6 +91,7 @@ class InspectionUpdateDoctor(BaseModel):
     prescriptions_delete_ids: list[int] | None = None
     prescriptions_create: list[PrescriptionCreate] | None = None
     inspection_at: datetime.datetime | None = None
+
 
 class InspectionPerDateRequest(BaseModel):
     status: Status | None = Status.COMPLETED

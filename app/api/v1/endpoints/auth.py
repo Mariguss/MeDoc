@@ -2,7 +2,8 @@ from fastapi import (
     APIRouter,
     Depends,
     Response,
-    Cookie, HTTPException,
+    Cookie,
+    HTTPException,
 )
 from starlette import status
 
@@ -19,14 +20,15 @@ router = APIRouter(
     tags=["auth"],
 )
 
+
 @router.post(
     "/login",
     response_model=TokenResponse,
 )
 async def login(
-        data: EmployeeAuth,
-        response: Response,
-        service: AuthService = Depends(get_auth_service),
+    data: EmployeeAuth,
+    response: Response,
+    service: AuthService = Depends(get_auth_service),
 ):
     access_, refresh_, expire_at = await service.login(data)
     response.set_cookie(
@@ -34,7 +36,7 @@ async def login(
         value=refresh_,
         httponly=True,
         samesite="strict",
-        secure=False, # на время без сертификата False
+        secure=False,  # на время без сертификата False
     )
     return {
         "access_token": access_,
@@ -42,13 +44,14 @@ async def login(
         "expires_at": expire_at,
     }
 
+
 @router.post(
     "/refresh",
     response_model=TokenResponse,
 )
 async def refresh(
-        refresh_token: str | None = Cookie(None),
-        service: AuthService = Depends(get_auth_service),
+    refresh_token: str | None = Cookie(None),
+    service: AuthService = Depends(get_auth_service),
 ):
     if not refresh_token:
         raise HTTPException(

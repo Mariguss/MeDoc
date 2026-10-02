@@ -11,18 +11,19 @@ from app.core.schema.base import BaseQuery
 class DiseaseBase(BaseModel):
     name: Annotated[str, Field(min_length=1, max_length=50)]
 
-class DiseaseResponse(DiseaseBase):
 
+class DiseaseResponse(DiseaseBase):
     model_config = {"from_attributes": True}
+
 
 class DiseaseResponseAdmin(DiseaseResponse):
     id: int
 
-class DiseaseCreate(DiseaseBase):
-    ...
 
-class DiseaseUpdate(DiseaseBase):
-    ...
+class DiseaseCreate(DiseaseBase): ...
 
-class DiseaseQuery(BaseQuery, DiseaseBase):
-    ...
+
+class DiseaseUpdate(DiseaseBase): ...
+
+
+class DiseaseQuery(BaseQuery, DiseaseBase): ...
