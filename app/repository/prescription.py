@@ -4,7 +4,7 @@ from app.core.model.prescription import Prescription
 from app.repository.base import BaseRepository
 
 
-class PrescriptionRepository(BaseRepository):
+class PrescriptionRepository(BaseRepository[Prescription]):
     def __init__(
             self,
             session: AsyncSession,

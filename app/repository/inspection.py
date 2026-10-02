@@ -13,12 +13,12 @@ from app.repository.base import BaseRepository
 
 T = TypeVar("T")
 
-class InspectionRepository(BaseRepository):
+class InspectionRepository():
     def __init__(
             self,
             session: AsyncSession,
     ) -> None:
-        super().__init__(session, Inspection)
+        self.session = session
 
     async def update_diseases(self, inspection_id: int, disease_ids: list[int]) -> None:
         await self.session.execute(

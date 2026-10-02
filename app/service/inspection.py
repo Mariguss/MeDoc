@@ -7,16 +7,19 @@ from app.core.exception import (
     NotFoundError,
 )
 from app.core.model import Prescription
+from app.core.schema.inspection import InspectionCreateAdmin, InspectionCreateDoctor, InspectionCreateDoctorInternal, \
+    InspectionUpdateAdmin, InspectionUpdateDoctor, InspectionPerDateRequest
 from app.repository.disease import DiseaseRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.inspection import InspectionRepository
 from app.repository.patient import PatientRepository
 from app.repository.prescription import PrescriptionRepository
+from app.service.base import BaseService
 
-T = TypeVar("T")
+T = TypeVar("T", )
 R = TypeVar("R")
 
-class InspectionService:
+class InspectionService():
     def __init__(
             self,
             repository_inspection: InspectionRepository,
@@ -33,7 +36,7 @@ class InspectionService:
         self._repository_prescription = repository_prescription
 
 
-    async def add_by_admin(self, schema: T) -> R:
+    async def add_by_admin(self, schema: InspectionCreateAdmin):
         try:
             employee_ = await self._repository_employee.exist(schema.doctor_id)
             if not employee_:
@@ -56,7 +59,7 @@ class InspectionService:
                 detail="Запись с такими уникальными атрибутами уже существует."
             )
 
-    async def add_by_doctor(self, schema: T) -> R:
+    async def add_by_doctor(self, schema: InspectionCreateDoctorInternal) -> R:
         try:
             employee_ = await self._repository_employee.exist(schema.doctor_id)
             if not employee_:
@@ -105,7 +108,7 @@ class InspectionService:
             )
 
 
-    async def patch_by_admin(self, id_: int, schema: T) -> T:
+    async def patch_by_admin(self, id_: int, schema: InspectionUpdateAdmin) -> T:
         try:
             if schema.doctor_id is not None:
                 employee_ = await self._repository_employee.exist(schema.doctor_id)
@@ -138,7 +141,7 @@ class InspectionService:
             raise e
 
 
-    async def patch_by_doctor(self, id_: int, schema: T) -> T:
+    async def patch_by_doctor(self, id_: int, schema: InspectionUpdateDoctor) -> T:
         try:
             if schema.patient_id is not None:
                 patient_ = await self._repository_patient.exist(schema.patient_id)
@@ -217,7 +220,7 @@ class InspectionService:
             await self._repository_inspection.session.rollback()
             raise e
 
-    async def inspection_per_day(self, schema: T) -> list:
+    async def inspection_per_day(self, schema: InspectionPerDateRequest) -> list:
         try:
             data = await self._repository_inspection.get_inspection_count_by_day(schema)
             return data

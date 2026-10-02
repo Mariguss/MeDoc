@@ -12,8 +12,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.model.base import Base
-from app.core.model.mixin import IntIdPKMixin
+from app.core.model.base import BaseWithId
 from app.core.model.mixin.created_at import CreatedAtMixin
 from app.core.model.mixin.updated_at import UpdatedAtMixin
 
@@ -25,7 +24,7 @@ class Sex(str, enum.Enum):
     FEMALE = "f"
 
 # в будущем добавить паспортные данные или номер телефона
-class Patient(Base, IntIdPKMixin, CreatedAtMixin, UpdatedAtMixin):
+class Patient(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
     name: Mapped[str] = mapped_column(String(50))
     sex: Mapped[Sex] = mapped_column(
         Enum(Sex),

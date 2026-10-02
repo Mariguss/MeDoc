@@ -4,7 +4,7 @@ from app.core.model.disease import Disease
 from app.repository.base import BaseRepository
 
 
-class DiseaseRepository(BaseRepository):
+class DiseaseRepository(BaseRepository[Disease]):
     def __init__(
             self,
             session: AsyncSession,

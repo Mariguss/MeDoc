@@ -13,8 +13,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from app.core.model.base import Base
-from app.core.model.mixin import IntIdPKMixin
+from app.core.model.base import BaseWithId
 from app.core.model.mixin import CreatedAtMixin
 from app.core.model.mixin import UpdatedAtMixin
 
@@ -28,7 +27,7 @@ class Status(str, enum.Enum):
     NO_SHOW = "no_show"            # Неявка — пациент не пришёл на запланированный приём
 
 
-class Inspection(Base, IntIdPKMixin, CreatedAtMixin, UpdatedAtMixin):
+class Inspection(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
     date: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

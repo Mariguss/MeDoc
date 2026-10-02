@@ -9,14 +9,13 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.model.base import Base
-from app.core.model.mixin import IntIdPKMixin
+from app.core.model.base import BaseWithId
 from app.core.model.mixin.updated_at import UpdatedAtMixin
 
 if TYPE_CHECKING:
     ...
 
-class Prescription(Base, IntIdPKMixin):
+class Prescription(BaseWithId, UpdatedAtMixin):
     __table_args__ = (
         UniqueConstraint(
             'inspection_id',

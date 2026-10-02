@@ -5,6 +5,7 @@ from sqlalchemy.orm import (
 )
 
 from app.core.config import settings
+from app.core.model.mixin import IntIdPKMixin
 
 
 class Base(DeclarativeBase):
@@ -15,3 +16,6 @@ class Base(DeclarativeBase):
     metadata = MetaData(
         naming_convention=settings.db.naming_convention,
     )
+
+class BaseWithId(Base, IntIdPKMixin):
+    __abstract__ = True

@@ -1,9 +1,10 @@
 # Для написания бизнес-логики (слой между repository и routes)
 from typing import (
     Generic,
-    TypeVar,
+    TypeVar, cast,
 )
 
+from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 
 from app.core.exception import (
@@ -11,48 +12,61 @@ from app.core.exception import (
     RelationshipViolationError,
     NotFoundError,
 )
+from app.core.model import Base
 from app.repository.interface import ReadResult
 
-T = TypeVar("T")
+DTOIn = TypeVar("DTOIn", bound=BaseModel)
+DTOOut = TypeVar("DTOOut", bound=BaseModel)
+ModelT = TypeVar("ModelT", bound=Base)
 
-class BaseService(Generic[T]):
+class BaseService(Generic[DTOIn, DTOOut]):
 
-    def __init__(self, repository) -> None:
+    def __init__(self, repository, model_class: type[Base]) -> None:
         self._repository = repository
+        self._model_class = model_class
 
-    async def get_list(self, **kwargs) -> ReadResult[T]:
+    async def get_list(self, **kwargs) -> ReadResult[DTOIn]:
         return await self._repository.read_by_options(**kwargs)
 
-    async def get_by_id(self, id_: int) -> T:
+    async def get_by_id(self, id_: int) -> DTOOut:
         obj = await self._repository.read_by_id(id_)
         if obj is None:
             raise NotFoundError(
                 detail=f"Запись с ID {id_} не найдена."
             )
-        return obj
+        return cast(DTOOut, obj)
 
-    async def add(self, schema: T) -> T:
+    async def add(self, schema: DTOIn) -> DTOOut:
         try:
-            obj = await self._repository.create(schema)
+            db_obj = self._model_class(**schema.model_dump())
+
+            obj = await self._repository.create(db_obj)
             await self._repository.session.commit()
             await self._repository.session.refresh(obj)
-            return obj
+            return cast(DTOOut, obj)
         except IntegrityError:
             await self._repository.session.rollback()
             raise DuplicatedError(
                 detail="Запись с такими уникальными атрибутами уже существует."
             )
 
-    async def patch(self, id_: int, schema: T) -> T:
+    async def patch(self, id_: int, schema: DTOIn) -> DTOOut:
         try:
-            obj = await self._repository.update(id_, schema)
+            obj = await self._repository.read_by_id(id_)
             if obj is None:
                 raise NotFoundError(
                     detail=f"Запись с ID {id_} не найдена."
                 )
+            update_data = schema.model_dump(exclude_unset=True)
+            for key, value in update_data.items():
+                setattr(obj, key, value)
+
+            await self._repository.session.update(obj)
+
             await self._repository.session.commit()
             await self._repository.session.refresh(obj)
-            return obj
+
+            return cast(DTOOut, obj)
         except IntegrityError:
             await self._repository.session.rollback()
             raise DuplicatedError(

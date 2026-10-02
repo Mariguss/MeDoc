@@ -7,11 +7,10 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from app.core.model import Base
-from app.core.model.mixin import IntIdPKMixin
+from app.core.model.base import BaseWithId
 
 
-class InspectionDisease(Base, IntIdPKMixin):
+class InspectionDisease(BaseWithId):
     __table_args__ = (
         UniqueConstraint("inspection_id", "disease_id"),
     )

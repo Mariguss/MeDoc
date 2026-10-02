@@ -7,5 +7,5 @@ class PrescriptionCreate(BaseModel):
 
 
 class PrescriptionUpdate(BaseModel):
-    id: int
+    medicine_id: int
     intake_method: str | None = None

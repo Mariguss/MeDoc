@@ -9,16 +9,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import func
 
 from app.core.exception import NotFoundError
+from app.core.model.base import BaseWithId
 from app.repository.interface import ReadResult
 
-T = TypeVar("T")
 
-class BaseRepository(Generic[T]):
+ModelT = TypeVar("ModelT", bound=BaseWithId)
+
+class BaseRepository(Generic[ModelT]):
 
     def __init__(
             self,
             session: AsyncSession,
-            model: T,
+            model: type[ModelT],
     ) -> None:
         self.session = session
         self._model = model
@@ -43,7 +45,7 @@ class BaseRepository(Generic[T]):
             page_size: int = 10,
             ordering: str = "-id",
             **kwargs,
-    ) -> ReadResult[T]:
+    ) -> ReadResult[ModelT]:
         stmt = select(self._model)
         stmt = self._build_stmt_with_filters(stmt, **kwargs)
 
@@ -56,7 +58,7 @@ class BaseRepository(Generic[T]):
         stmt_paginated = stmt.limit(page_size).offset((page - 1) * page_size)
         results = await self.session.execute(stmt_paginated)
         results_scal = results.scalars().unique().all()
-        founds: list[T] = cast(list[T], results_scal)
+        founds: list[ModelT] = cast(list[ModelT], results_scal)
 
         count_stmt = select(func.count()).select_from(self._model)
         count_stmt = self._build_stmt_with_filters(count_stmt, **kwargs)
@@ -64,7 +66,7 @@ class BaseRepository(Generic[T]):
 
         return {"founds": founds, "total_count": total_count}
 
-    async def read_by_id(self, id_: int) -> T | None:
+    async def read_by_id(self, id_: int) -> ModelT | None:
         stmt = select(self._model).where(self._model.id == id_)
         result = await self.session.execute(stmt)
 
@@ -87,37 +89,19 @@ class BaseRepository(Generic[T]):
                 return False
         return True
 
-    async def create(self, schema: T) -> T:
-        obj = self._model(**schema.model_dump(exclude_none=True))
-        self.session.add(obj)
+    async def create(self, obj_data: ModelT) -> ModelT:
+        self.session.add(obj_data)
 
-        return obj
+        return obj_data
 
-    async def create_all(self, objs: list[T]) -> None:
+    async def create_all(self, objs: list[ModelT]) -> None:
         for obj in objs:
             self.session.add(obj)
 
-    async def update(self, id_: int, schema: T) -> T | None:
-        stmt = select(self._model).where(self._model.id == id_)
-        result = await self.session.execute(stmt)
-        obj = result.scalars().first()
+    async def update(self,obj_data: ModelT) -> ModelT:
+        await self.session.flush()
 
-        if obj is None:
-            return None
-
-        data = schema.model_dump(exclude_unset=True)
-        for k, v in data.items():
-            setattr(obj, k, v)
-
-        return obj
-
-    async def update_all(self, objs: list[T]) -> bool:
-        for obj in objs:
-            id_ = obj.id
-            flag = await self.update(id_, obj)
-            if flag is None:
-                return False
-        return True
+        return obj_data
 
     async def delete_by_id(self, id_: int) -> None:
         stmt = select(self._model).where(self._model.id == id_)
@@ -132,4 +116,3 @@ class BaseRepository(Generic[T]):
     async def delete_all_by_id(self, ids_: list[int]) -> None:
         for id_ in ids_:
             await self.delete_by_id(id_)
-

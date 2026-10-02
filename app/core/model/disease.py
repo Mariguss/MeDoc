@@ -7,14 +7,13 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from app.core.model.base import Base
-from app.core.model.mixin import IntIdPKMixin
+from app.core.model.base import BaseWithId
 from app.core.model.mixin.created_at import CreatedAtMixin
 
 if TYPE_CHECKING:
     from app.core.model.inspection import Inspection
 
-class Disease(Base, IntIdPKMixin, CreatedAtMixin):
+class Disease(BaseWithId, CreatedAtMixin):
     name: Mapped[str] = mapped_column(String(50), unique=True)
 
     inspections: Mapped[list["Inspection"]] = relationship(
