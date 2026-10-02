@@ -23,10 +23,10 @@ class MedicineResponseAdmin(MedicineResponse):
 class MedicineCreate(MedicineBase):
     ...
 
-class MedicineUpdate(MedicineBase):
+class MedicineUpdate(BaseModel):
     name: Annotated[str | None, Field(min_length=1, max_length=50)] = None
-    properties: str | None = 0
-    side_effects: str | None = 0
+    properties: str | None = None
+    side_effects: str | None = None
 
 class MedicineQuery(BaseQuery, MedicineBase):
     ...

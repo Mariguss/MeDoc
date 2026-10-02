@@ -23,7 +23,7 @@ class AuthService(BaseService):
                 raise NotFoundError(
                     detail=f"Запись с login {schema.login} не найдена."
                 )
-            if not verify_password(schema.password, obj.password_hash):
+            if not verify_password(schema.password_hash, obj.password_hash):
                 raise HTTPException(status.HTTP_401_UNAUTHORIZED) # смешение api и service логики?!!!
 
             subject = {"sub": str(obj.id), "role": str(obj.role.value)}

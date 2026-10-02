@@ -3,7 +3,6 @@ import datetime
 from pydantic import (
     BaseModel,
 )
-from pydantic.json_schema import SkipJsonSchema
 
 from app.core.model.inspection import Status
 from app.core.schema.prescription import (
@@ -18,6 +17,7 @@ class InspectionBase(BaseModel):
     instructions: str | None = None
     doctor_id: int
     patient_id: int
+    inspection_at: datetime.datetime | None = None
 
 class InspectionResponse(BaseModel):
     inspection_at: datetime.datetime | None = None
@@ -52,10 +52,11 @@ class InspectionCreateAdmin(BaseModel):
     inspection_at: datetime.datetime | None = None
 
 # по записи, но осмотра не было
-class InspectionUpdateAdmin(InspectionCreateAdmin):
+class InspectionUpdateAdmin(BaseModel):
     doctor_id: int | None = None
     patient_id: int | None = None
     address: str | None = None
+    inspection_at: datetime.datetime | None = None
 
 # добавить для осмотра без записи. в порядке очереди
 class InspectionCreateDoctor(BaseModel):
@@ -72,12 +73,16 @@ class InspectionCreateDoctor(BaseModel):
 class InspectionCreateDoctorInternal(InspectionCreateDoctor):
     doctor_id: int
 
-class InspectionUpdateDoctor(InspectionCreateDoctor):
+class InspectionUpdateDoctor(BaseModel):
     patient_id: int | None = None
     address: str | None = None
+    symptoms: str | None = None
+    instructions: str | None = None
     status: Status | None = None
+    disease_ids: list[int] | None = None
     prescriptions_update: list[PrescriptionUpdate] | None = None
     prescriptions_delete_ids: list[int] | None = None
+    prescriptions_create: list[PrescriptionCreate] | None = None
     inspection_at: datetime.datetime | None = None
 
 class InspectionPerDateRequest(BaseModel):

@@ -17,7 +17,11 @@ def create_jwt_token(subject: dict, type_: str | None = "access", expires_delta:
     if expires_delta:
         expire = now + expires_delta
     else:
-        expire = now + timedelta(seconds=settings.token.access_token_expire_seconds)
+        expires_seconds: float = (
+            settings.token.access_token_expire_seconds if type_ == "access"
+            else settings.token.refresh_token_expire_seconds
+        )
+        expire = now + timedelta(seconds=expires_seconds)
 
     payload = {
         "exp": int(expire.timestamp()),

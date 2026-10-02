@@ -53,8 +53,6 @@ class EmployeeCreate(EmployeeBase):
         return get_password_hash(v)
 
 class EmployeeUpdate(EmployeeBase):
-    login: Annotated[str | None, Field(min_length=5, max_length=15)] = None
-    name: Annotated[str | None, Field(min_length=1, max_length=50)] = None
     role: Role | None = None
     speciality: Annotated[str | None, Field(min_length=1, max_length=50)] = None
 

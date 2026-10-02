@@ -55,8 +55,8 @@ class BaseRepository(Generic[T]):
 
         stmt_paginated = stmt.limit(page_size).offset((page - 1) * page_size)
         results = await self.session.execute(stmt_paginated)
-        founds = results.scalars().unique().all()
-        founds: list[T] = cast(list[T], founds)
+        results_scal = results.scalars().unique().all()
+        founds: list[T] = cast(list[T], results_scal)
 
         count_stmt = select(func.count()).select_from(self._model)
         count_stmt = self._build_stmt_with_filters(count_stmt, **kwargs)
