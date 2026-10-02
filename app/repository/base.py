@@ -98,10 +98,8 @@ class BaseRepository(Generic[ModelT]):
         for obj in objs:
             self.session.add(obj)
 
-    async def update(self,obj_data: ModelT) -> ModelT:
+    async def update(self) -> None:
         await self.session.flush()
-
-        return obj_data
 
     async def delete_by_id(self, id_: int) -> None:
         stmt = select(self._model).where(self._model.id == id_)

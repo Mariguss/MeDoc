@@ -1,3 +1,4 @@
+import datetime
 from typing import TypeVar
 
 from sqlalchemy import delete, select
@@ -8,17 +9,31 @@ from app.core.model import (
     InspectionDisease,
     Disease,
 )
-from app.core.model.inspection import Inspection
-from app.repository.base import BaseRepository
+from app.core.model.inspection import Inspection, Status
 
 T = TypeVar("T")
 
-class InspectionRepository():
+class InspectionRepository:
     def __init__(
             self,
             session: AsyncSession,
     ) -> None:
         self.session = session
+        self._model = Inspection
+
+    async def create(self, obj_data: Inspection) -> Inspection:
+        self.session.add(obj_data)
+
+        return obj_data
+
+    async def update(self) -> None:
+        await self.session.flush()
+
+    async def read_by_id(self, id_: int) -> Inspection | None:
+        stmt = select(self._model).where(self._model.id == id_)
+        result = await self.session.execute(stmt)
+
+        return result.scalars().first()
 
     async def update_diseases(self, inspection_id: int, disease_ids: list[int]) -> None:
         await self.session.execute(
@@ -33,7 +48,11 @@ class InspectionRepository():
             )
             self.session.add(link)
 
-    async def get_inspection_count_by_day(self, schema: T) -> list:
+    async def get_inspection_count_by_day(
+            self, status_: Status | None = Status.COMPLETED,
+            start_date_: datetime.datetime | None = None,
+            end_date_: datetime.datetime | None = None) -> list:
+
         date_label = func.date(Inspection.inspection_at).label("inspection_date")
 
         stmt = (
@@ -43,16 +62,12 @@ class InspectionRepository():
             )
         )
 
-        status_ = schema.status
-        start = schema.start_date
-        end = schema.end_date
-
         if status_ is not None:
             stmt = stmt.where(Inspection.status == status_)
-        if start is not None:
-            stmt = stmt.where(func.date(Inspection.inspection_at) >= start)
-        if end is not None:
-            stmt = stmt.where(func.date(Inspection.inspection_at) <= end)
+        if start_date_ is not None:
+            stmt = stmt.where(func.date(Inspection.inspection_at) >= start_date_)
+        if end_date_ is not None:
+            stmt = stmt.where(func.date(Inspection.inspection_at) <= end_date_)
 
         stmt = stmt.group_by(date_label).order_by(date_label.desc())
 

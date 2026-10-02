@@ -7,10 +7,12 @@ from fastapi import (
 from starlette import status
 
 from app.core.dependencies import get_auth_service
+from app.core.exception import AuthError
 from app.core.schema.auth import (
     EmployeeAuth,
     TokenResponse,
 )
+from app.core.security import JWTBearer
 from app.service.auth import AuthService
 
 router = APIRouter(
@@ -53,6 +55,9 @@ async def refresh(
             detail="Сессия истекла. Пожалуйста, авторизуйтесь заново",
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
+    payload = JWTBearer.verify_jwt(refresh_token)
+    if payload.get("type") != "refresh":
+        raise AuthError(detail="Ожидали получить refresh token")
     new_access, new_expire = await service.refresh(refresh_token)
 
     return {

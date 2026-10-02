@@ -13,9 +13,9 @@ from app.service.base import BaseService
 from app.util.hashing import verify_password
 
 
-class AuthService(BaseService):
+class AuthService():
     def __init__(self, repository: EmployeeRepository):
-        super().__init__(repository, Employee)
+        self._repository = repository
 
     async def login(self, schema: EmployeeAuth) -> tuple[str, str, str]:
         try:
@@ -44,8 +44,11 @@ class AuthService(BaseService):
         if payload.get("type") != "refresh":
             raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
-        user_id = payload.get("sub")
-        user_role = payload.get("role")
+        user_id: int | None = payload.get("sub")
+        user_role: str | None = payload.get("role")
+
+        if user_id is None or user_role is None:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
 
         if not await self._repository.exist(user_id):
             raise HTTPException(status.HTTP_403_FORBIDDEN)

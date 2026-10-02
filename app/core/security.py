@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+from typing import Any
 
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -76,7 +77,7 @@ class JWTBearer(HTTPBearer):
         # если клиент вообще забыл прикрепить токен
         super(JWTBearer, self).__init__(auto_error=auto_error)
 
-    async def __call__(self, request: Request) -> dict | None:
+    async def __call__(self, request: Request) -> Any:
         # Он идет в заголовки запроса и вытаскивает оттуда строчку "Authorization: Bearer <токен>"
         credentials_: HTTPAuthorizationCredentials | None = await super().__call__(request)
 

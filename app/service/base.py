@@ -1,7 +1,7 @@
 # Для написания бизнес-логики (слой между repository и routes)
 from typing import (
     Generic,
-    TypeVar, cast,
+    TypeVar, cast, Any,
 )
 
 from pydantic import BaseModel
@@ -34,7 +34,7 @@ class BaseService(Generic[DTOIn, DTOOut]):
             raise NotFoundError(
                 detail=f"Запись с ID {id_} не найдена."
             )
-        return cast(DTOOut, obj)
+        return cast(DTOOut, cast(Any, obj))
 
     async def add(self, schema: DTOIn) -> DTOOut:
         try:
@@ -43,7 +43,7 @@ class BaseService(Generic[DTOIn, DTOOut]):
             obj = await self._repository.create(db_obj)
             await self._repository.session.commit()
             await self._repository.session.refresh(obj)
-            return cast(DTOOut, obj)
+            return cast(DTOOut, cast(Any, obj))
         except IntegrityError:
             await self._repository.session.rollback()
             raise DuplicatedError(
@@ -61,12 +61,12 @@ class BaseService(Generic[DTOIn, DTOOut]):
             for key, value in update_data.items():
                 setattr(obj, key, value)
 
-            await self._repository.session.update(obj)
+            await self._repository.session.update()
 
             await self._repository.session.commit()
             await self._repository.session.refresh(obj)
 
-            return cast(DTOOut, obj)
+            return cast(DTOOut, cast(Any, obj))
         except IntegrityError:
             await self._repository.session.rollback()
             raise DuplicatedError(

@@ -83,6 +83,7 @@ async def get_inspection_service(
     repo_patient: PatientRepository = Depends(get_patient_repository),
     repo_disease: DiseaseRepository = Depends(get_disease_repository),
     repo_prescription: PrescriptionRepository = Depends(get_prescription_repository),
+    repo_medicine: MedicineRepository = Depends(get_medicine_repository),
 
 
 ) -> InspectionService:
@@ -92,6 +93,7 @@ async def get_inspection_service(
         repo_patient,
         repo_disease,
         repo_prescription,
+        repo_medicine,
     )
 
 async def get_auth_service(

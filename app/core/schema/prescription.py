@@ -6,6 +6,5 @@ class PrescriptionCreate(BaseModel):
     intake_method: str | None = None
 
 
-class PrescriptionUpdate(BaseModel):
-    medicine_id: int
-    intake_method: str | None = None
+class PrescriptionUpdate(PrescriptionCreate):
+    id: int

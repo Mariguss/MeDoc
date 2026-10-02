@@ -16,7 +16,9 @@ from app.core.schema.inspection import (
     InspectionPerDateRequest,
     InspectionCreateDoctor,
     InspectionResponseDoctor,
-    InspectionUpdateAdmin, InspectionCreateDoctorInternal,
+    InspectionUpdateAdmin,
+    InspectionCreateDoctorInternal,
+    InspectionResponse,
 )
 from app.service.inspection import InspectionService
 
@@ -83,7 +85,7 @@ async def create_inspection_by_doctor(
         service: InspectionService = Depends(get_inspection_service),
         doctor_id: int = Depends(get_current_user_id),
         _role: str = Depends(required_roles(["doctor"])),
-) -> InspectionResponseDoctor:
+) -> InspectionResponse:
     print("doctor_id in api", doctor_id)
     data = InspectionCreateDoctorInternal(**inspection.model_dump(), doctor_id=doctor_id)
     return await service.add_by_doctor(data)
