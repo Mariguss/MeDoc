@@ -1,13 +1,6 @@
 import uvicorn
-from fastapi import FastAPI
 
-from app.api.v1.routes import routers
-from app.core.exceptions_handler import register_exception_handlers
-
-app = FastAPI()
-register_exception_handlers(app)
-
-app.include_router(routers)
+from app.core.server import app
 
 
 @app.get("/")
