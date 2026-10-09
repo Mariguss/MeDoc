@@ -27,7 +27,7 @@ class BaseService(Generic[DTOIn, DTOOut]):
         self._repository = repository
         self._model_class = model_class
 
-    async def get_list(self, **kwargs) -> ReadResult[DTOIn]:
+    async def get_list(self, **kwargs) -> ReadResult[DTOOut]:
         return await self._repository.read_by_options(**kwargs)
 
     async def get_by_id(self, id_: int) -> DTOOut:

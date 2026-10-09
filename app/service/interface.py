@@ -7,23 +7,32 @@ from typing import (
     TypeVar,
 )
 
+from pydantic import BaseModel
+
 from app.repository.interface import ReadResult
 
-T = TypeVar("T")
+
+DTOIn = TypeVar("DTOIn", bound=BaseModel)
+DTOOut = TypeVar("DTOOut", bound=BaseModel)
 
 
-class BaseServiceABC(Generic[T], ABC):
+class BaseServiceABC(Generic[DTOIn, DTOOut], ABC):
     @abstractmethod
-    async def get_list(self, **kwargs) -> ReadResult[T]: ...
-
-    @abstractmethod
-    async def get_by_id(self, id_: int) -> T | None: ...
-
-    @abstractmethod
-    async def add(self, schema: T) -> T: ...
+    async def get_list(self, **kwargs) -> ReadResult[DTOOut]:
+        pass
 
     @abstractmethod
-    async def patch(self, id_: int, schema: T) -> T: ...
+    async def get_by_id(self, id_: int) -> DTOOut:
+        pass
 
     @abstractmethod
-    async def remove_by_id(self, id_: int) -> None: ...
+    async def add(self, schema: DTOIn) -> DTOOut:
+        pass
+
+    @abstractmethod
+    async def patch(self, id_: int, schema: DTOIn) -> DTOOut:
+        pass
+
+    @abstractmethod
+    async def remove_by_id(self, id_: int) -> None:
+        pass
