@@ -3,9 +3,9 @@ import enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    String,
-    Enum,
     Date,
+    Enum,
+    String,
 )
 from sqlalchemy.orm import (
     Mapped,

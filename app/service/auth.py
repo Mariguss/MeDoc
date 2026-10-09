@@ -2,14 +2,12 @@ from fastapi import HTTPException
 from starlette import status
 
 from app.core.exception import NotFoundError
-from app.core.model import Employee
 from app.core.schema.auth import EmployeeAuth
 from app.core.security import (
     create_jwt_token,
     decode_jwt,
 )
 from app.repository.employee import EmployeeRepository
-from app.service.base import BaseService
 from app.util.hashing import verify_password
 
 

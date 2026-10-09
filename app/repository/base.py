@@ -12,7 +12,6 @@ from app.core.exception import NotFoundError
 from app.core.model.base import BaseWithId
 from app.repository.interface import ReadResult
 
-
 ModelT = TypeVar("ModelT", bound=BaseWithId)
 
 

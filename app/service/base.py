@@ -1,9 +1,9 @@
 # Для написания бизнес-логики (слой между repository и routes)
 from typing import (
+    Any,
     Generic,
     TypeVar,
     cast,
-    Any,
 )
 
 from pydantic import BaseModel
@@ -11,8 +11,8 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.exception import (
     DuplicatedError,
-    RelationshipViolationError,
     NotFoundError,
+    RelationshipViolationError,
 )
 from app.core.model import Base
 from app.repository.interface import ReadResult

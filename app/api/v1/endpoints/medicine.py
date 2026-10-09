@@ -4,13 +4,13 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.dependencies import get_medicine_service, required_roles, auth_bearer
+from app.core.dependencies import auth_bearer, get_medicine_service
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.medicine import (
+    MedicineCreate,
     MedicineResponse,
     MedicineResponseAdmin,
     MedicineUpdate,
-    MedicineCreate,
 )
 from app.service.medicine import MedicineService
 

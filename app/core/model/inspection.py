@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DateTime,
-    func,
     ForeignKey,
+    func,
 )
 from sqlalchemy.orm import (
     Mapped,
@@ -14,8 +14,7 @@ from sqlalchemy.orm import (
 )
 
 from app.core.model.base import BaseWithId
-from app.core.model.mixin import CreatedAtMixin
-from app.core.model.mixin import UpdatedAtMixin
+from app.core.model.mixin import CreatedAtMixin, UpdatedAtMixin
 
 if TYPE_CHECKING:
     from app.core.model.disease import Disease
@@ -50,7 +49,7 @@ class Inspection(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
         DateTime(timezone=True),
     )
 
-    diseases: Mapped[list["Disease"]] = relationship(
+    diseases: Mapped[list[Disease]] = relationship(
         "Disease",
         secondary="inspectiondiseases",
         back_populates="inspections",

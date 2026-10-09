@@ -1,9 +1,9 @@
 from datetime import timedelta
 from typing import Any
 
-from fastapi import Request, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
+from fastapi import HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette import status
 
 from app.core.config import settings
@@ -85,7 +85,7 @@ class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
         # auto_error=True заставляет FastAPI автоматически выкидывать ошибку,
         # если клиент вообще забыл прикрепить токен
-        super(JWTBearer, self).__init__(auto_error=auto_error)
+        super().__init__(auto_error=auto_error)
 
     async def __call__(self, request: Request) -> Any:
         # Он идет в заголовки запроса и вытаскивает оттуда строчку "Authorization: Bearer <токен>"

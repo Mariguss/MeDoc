@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import func
 
 from app.core.model import (
-    InspectionDisease,
     Disease,
+    InspectionDisease,
 )
 from app.core.model.inspection import Inspection, Status
 

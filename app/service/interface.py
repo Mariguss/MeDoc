@@ -11,7 +11,6 @@ from pydantic import BaseModel
 
 from app.repository.interface import ReadResult
 
-
 DTOIn = TypeVar("DTOIn", bound=BaseModel)
 DTOOut = TypeVar("DTOOut", bound=BaseModel)
 

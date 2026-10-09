@@ -4,21 +4,21 @@ from fastapi import (
 )
 
 from app.core.dependencies import (
-    get_inspection_service,
-    required_roles,
     auth_bearer,
     get_current_user_id,
+    get_inspection_service,
+    required_roles,
 )
 from app.core.schema.inspection import (
-    InspectionResponseAdmin,
     InspectionCreateAdmin,
-    InspectionUpdateDoctor,
-    InspectionPerDateRequest,
     InspectionCreateDoctor,
+    InspectionCreateDoctorInternal,
+    InspectionPerDateRequest,
+    InspectionResponse,
+    InspectionResponseAdmin,
     InspectionResponseDoctor,
     InspectionUpdateAdmin,
-    InspectionCreateDoctorInternal,
-    InspectionResponse,
+    InspectionUpdateDoctor,
 )
 from app.service.inspection import InspectionService
 

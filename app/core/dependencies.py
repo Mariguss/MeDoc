@@ -1,8 +1,9 @@
-from typing import Callable
+from collections.abc import Callable
 
-from fastapi import HTTPException
-
-from fastapi import Depends
+from fastapi import (
+    Depends,
+    HTTPException,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 

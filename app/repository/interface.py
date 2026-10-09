@@ -4,8 +4,8 @@ from abc import (
 )
 from typing import (
     Generic,
-    TypeVar,
     TypedDict,
+    TypeVar,
 )
 
 T = TypeVar("T")

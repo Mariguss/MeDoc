@@ -4,12 +4,12 @@ from fastapi import (
     HTTPException,
 )
 
-from app.core.dependencies import get_disease_service, auth_bearer
+from app.core.dependencies import auth_bearer, get_disease_service
 from app.core.schema.base import PaginatedResponse
 from app.core.schema.disease import (
+    DiseaseCreate,
     DiseaseResponse,
     DiseaseResponseAdmin,
-    DiseaseCreate,
     DiseaseUpdate,
 )
 from app.service.disease import DiseaseService

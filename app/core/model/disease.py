@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class Disease(BaseWithId, CreatedAtMixin):
     name: Mapped[str] = mapped_column(String(50), unique=True)
 
-    inspections: Mapped[list["Inspection"]] = relationship(
+    inspections: Mapped[list[Inspection]] = relationship(
         "Inspection",
         secondary="inspectiondiseases",
         back_populates="diseases",

@@ -1,4 +1,4 @@
-from typing import TypeVar, cast, Any
+from typing import Any, TypeVar, cast
 
 from sqlalchemy.exc import IntegrityError
 
@@ -6,22 +6,22 @@ from app.core.exception import (
     DuplicatedError,
     NotFoundError,
 )
-from app.core.model import Prescription, Inspection
+from app.core.model import Inspection, Prescription
 from app.core.schema.inspection import (
     InspectionCreateAdmin,
     InspectionCreateDoctorInternal,
-    InspectionUpdateAdmin,
-    InspectionUpdateDoctor,
     InspectionPerDateRequest,
     InspectionResponseAdmin,
     InspectionResponseDoctor,
+    InspectionUpdateAdmin,
+    InspectionUpdateDoctor,
 )
 from app.repository.disease import DiseaseRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.inspection import InspectionRepository
+from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.repository.prescription import PrescriptionRepository
-from app.repository.medicine import MedicineRepository
 
 T = TypeVar(
     "T",

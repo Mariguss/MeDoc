@@ -1,8 +1,8 @@
 from datetime import (
+    UTC,
     datetime,
-    timezone,
 )
 
 
 def get_now():
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
