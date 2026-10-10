@@ -29,6 +29,12 @@ def upgrade() -> None:
         batch_op.add_column(sa.Column("created_at", sa.DateTime(), nullable=True))
         batch_op.add_column(sa.Column("updated_at", sa.DateTime(), nullable=True))
 
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        sa.Enum(
+            "SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW", name="status"
+        ).create(bind, checkfirst=True)
+
     with op.batch_alter_table("inspections", schema=None) as batch_op:
         batch_op.add_column(
             sa.Column(
@@ -68,6 +74,10 @@ def downgrade() -> None:
         batch_op.drop_column("created_at")
         batch_op.drop_column("inspection_at")
         batch_op.drop_column("status")
+
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        sa.Enum(name="status").drop(bind, checkfirst=True)
 
     with op.batch_alter_table("employees", schema=None) as batch_op:
         batch_op.drop_column("updated_at")
