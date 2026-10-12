@@ -35,8 +35,8 @@ async def test_login_200(client: AsyncClient, login_, password_) -> None:
     assert response.json()["access_token"] == "fake_access_token"
     assert "refresh_token" in response.cookies
     assert response.cookies["refresh_token"] == "fake_refresh_token"
-    print(response.json())
-    print(response.cookies)
+    # print(response.json())
+    # print(response.cookies)
 
 @pytest.mark.parametrize(
     'login_, password_',
