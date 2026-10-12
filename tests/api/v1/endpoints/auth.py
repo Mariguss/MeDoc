@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -81,3 +81,34 @@ async def test_login_wrong_params_422(client: AsyncClient) -> None:
     response = await client.post("/login", json=bad_user)
 
     assert response.status_code == 422
+
+@pytest.mark.asyncio
+async def test_refresh_missing_cookie(client: AsyncClient) -> None:
+    # Делаем запрос БЕЗ передачи каких-либо кук
+    response = await client.post("/refresh")
+
+    assert response.status_code == 401
+    assert (
+        response.json()["detail"] == "Сессия истекла. Пожалуйста, авторизуйтесь заново"
+    )
+
+@pytest.mark.asyncio
+async def test_refresh_200_success(client: AsyncClient, mock_auth_service) -> None:
+    mock_auth_service.refresh.return_value = (
+        "new_fake_access_token",
+        "2026-10-12T19:00:00",
+    )
+
+    test_cookies = {"refresh_token": "some_random_token_string"}
+
+    with patch("app.core.security.JWTBearer.verify_jwt") as mock_verify:
+        mock_verify.return_value = {"sub": "1", "role": "employee", "type": "refresh"}
+
+        response = await client.post("/refresh", cookies=test_cookies)
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["access_token"] == "new_fake_access_token"
+    assert data["token_type"] == "bearer"
+    assert data["expires_at"] == "2026-10-12T19:00:00"
