@@ -1,38 +1,26 @@
 from collections.abc import AsyncGenerator, Generator
+from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
-from app.core.database import database
+from app.core.dependencies import get_auth_service
 from app.core.server import create_app
 
 
 @pytest.fixture(scope="session")
 def app() -> Generator[FastAPI]:
-    """
-    Create a new FastAPI app
-    """
-    app = create_app()
-
-    yield app
+    app_ = create_app()
+    yield app_
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(app: FastAPI, db_session) -> AsyncGenerator[AsyncClient]:
-    """
-    Create a new FastAPI AsyncClient
-    """
-
-    async def _get_session():
-        return db_session
-
-    app.dependency_overrides[database.get_session] = _get_session
-
+async def client(app: FastAPI, mock_auth_service) -> AsyncGenerator[AsyncClient]:
     async with AsyncClient(
-        transport=ASGITransport(app), base_url="http://test"
-    ) as client:
-        yield client
+        transport=ASGITransport(app), base_url="http://testserver/"
+    ) as client_:
+        yield client_
 
-    app.dependency_overrides.pop(database.get_session, None)
+    app.dependency_overrides.clear()
