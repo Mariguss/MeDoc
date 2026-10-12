@@ -26,7 +26,6 @@ class NotFoundError(Exception):
 
 class AuthError(Exception):
     """Выбрасывается при проблемах с авторизацией/аутентификацией."""
-
     def __init__(self, detail: str = "Authentication failed"):
         self.detail = detail
         super().__init__(self.detail)
@@ -35,13 +34,30 @@ class AuthError(Exception):
 class WrongCredentialsError(AuthError):
     """Частный случай AuthError."""
 
-    def __init__(self, detail: str = "Invalid username or password"):
+    def __init__(self, detail: str = "Неправильный логин или пароль"):
         super().__init__(detail)
 
 
 class ValidationError(Exception):
     """Выбрасывается при ошибке валидации данных (не Pydantic)."""
-
     def __init__(self, detail: str = "Invalid data provided"):
         self.detail = detail
         super().__init__(self.detail)
+
+class UnauthorizedError(Exception):
+    """Выбрасывается при 401"""
+    def __init__(self, detail: str = "Вы не авторизовались в системе"):
+        self.detail = detail
+        super().__init__(self.detail)
+
+
+class AccessDeniedError(Exception):
+    """Выбрасывается при 403 ошибке."""
+    def __init__(self, detail: str = "Доступ запрещен, у вас недостаточно прав"):
+        self.detail = detail
+        super().__init__(self.detail)
+
+class NewException(Exception):
+    """
+    Выбрасывается вместо Exception для устранения 500 кодов
+    """
