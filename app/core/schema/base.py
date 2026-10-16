@@ -1,15 +1,11 @@
 from typing import (
     Annotated,
-    Generic,
-    TypeVar,
 )
 
 from pydantic import (
     BaseModel,
     Field,
 )
-
-T = TypeVar("T")
 
 
 class BaseQuery(BaseModel):
@@ -19,6 +15,6 @@ class BaseQuery(BaseModel):
     sort_order: Annotated[str | None, Field(pattern="^(asc|desc)$")] = "asc"
 
 
-class PaginatedResponse(BaseModel, Generic[T]):
+class PaginatedResponse[T](BaseModel):
     founds: list[T]
     total_count: int

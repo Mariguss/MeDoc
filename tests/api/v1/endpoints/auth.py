@@ -21,10 +21,10 @@ def mock_auth_service(app):
 
 
 @pytest.mark.parametrize(
-    'login_, password_',
+    "login_, password_",
     [
         ("testtest", "Aa123456!"),
-    ]
+    ],
 )
 @pytest.mark.asyncio
 async def test_login_200(client: AsyncClient, login_, password_) -> None:
@@ -38,14 +38,15 @@ async def test_login_200(client: AsyncClient, login_, password_) -> None:
     # print(response.json())
     # print(response.cookies)
 
+
 @pytest.mark.parametrize(
-    'login_, password_',
+    "login_, password_",
     [
         ("testtest", "!"),
         ("user", "!"),
         ("user", "Aa123456!"),
         ("", ""),
-    ]
+    ],
 )
 @pytest.mark.asyncio
 async def test_login_422(client: AsyncClient, login_, password_) -> None:
@@ -54,12 +55,14 @@ async def test_login_422(client: AsyncClient, login_, password_) -> None:
 
     assert response.status_code == 422
 
+
 @pytest.mark.asyncio
 async def test_login_without_login_422(client: AsyncClient) -> None:
     bad_user = {"password": "Aa123456!"}
     response = await client.post("/login", json=bad_user)
 
     assert response.status_code == 422
+
 
 @pytest.mark.asyncio
 async def test_login_without_password_422(client: AsyncClient) -> None:
@@ -68,12 +71,14 @@ async def test_login_without_password_422(client: AsyncClient) -> None:
 
     assert response.status_code == 422
 
+
 @pytest.mark.asyncio
 async def test_login_without_params_422(client: AsyncClient) -> None:
-    bad_user = {}
+    bad_user: dict = {}
     response = await client.post("/login", json=bad_user)
 
     assert response.status_code == 422
+
 
 @pytest.mark.asyncio
 async def test_login_wrong_params_422(client: AsyncClient) -> None:
@@ -81,6 +86,7 @@ async def test_login_wrong_params_422(client: AsyncClient) -> None:
     response = await client.post("/login", json=bad_user)
 
     assert response.status_code == 422
+
 
 @pytest.mark.asyncio
 async def test_refresh_missing_cookie(client: AsyncClient) -> None:
@@ -91,6 +97,7 @@ async def test_refresh_missing_cookie(client: AsyncClient) -> None:
     assert (
         response.json()["detail"] == "Сессия истекла. Пожалуйста, авторизуйтесь заново"
     )
+
 
 @pytest.mark.asyncio
 async def test_refresh_200_success(client: AsyncClient, mock_auth_service) -> None:

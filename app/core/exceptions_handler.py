@@ -5,11 +5,11 @@ from app.core.exception import (
     AccessDeniedError,
     AuthError,
     DuplicatedError,
+    NewException,
     NotFoundError,
     RelationshipViolationError,
-    ValidationError,
-    NewException,
     UnauthorizedError,
+    ValidationError,
 )
 
 
@@ -37,7 +37,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AccessDeniedError)
     async def _(_: Request, exc: AccessDeniedError) -> JSONResponse:
         return JSONResponse(status_code=403, content={"detail": exc.detail})
-    
+
     @app.exception_handler(UnauthorizedError)
     async def _(_: Request, exc: UnauthorizedError) -> JSONResponse:
         return JSONResponse(status_code=403, content={"detail": exc.detail})

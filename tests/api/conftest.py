@@ -1,12 +1,10 @@
 from collections.abc import AsyncGenerator, Generator
-from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
-from app.core.dependencies import get_auth_service
 from app.core.server import create_app
 
 

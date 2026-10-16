@@ -26,6 +26,7 @@ class NotFoundError(Exception):
 
 class AuthError(Exception):
     """Выбрасывается при проблемах с авторизацией/аутентификацией."""
+
     def __init__(self, detail: str = "Authentication failed"):
         self.detail = detail
         super().__init__(self.detail)
@@ -40,12 +41,15 @@ class WrongCredentialsError(AuthError):
 
 class ValidationError(Exception):
     """Выбрасывается при ошибке валидации данных (не Pydantic)."""
+
     def __init__(self, detail: str = "Invalid data provided"):
         self.detail = detail
         super().__init__(self.detail)
 
+
 class UnauthorizedError(Exception):
     """Выбрасывается при 401"""
+
     def __init__(self, detail: str = "Вы не авторизовались в системе"):
         self.detail = detail
         super().__init__(self.detail)
@@ -53,9 +57,11 @@ class UnauthorizedError(Exception):
 
 class AccessDeniedError(Exception):
     """Выбрасывается при 403 ошибке."""
+
     def __init__(self, detail: str = "Доступ запрещен, у вас недостаточно прав"):
         self.detail = detail
         super().__init__(self.detail)
+
 
 class NewException(Exception):
     """

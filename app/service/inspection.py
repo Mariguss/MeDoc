@@ -1,6 +1,7 @@
 from typing import Any, TypeVar, cast
 
-from sqlalchemy.exc import IntegrityError
+from loguru import logger
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.core.exception import (
     DuplicatedError,
@@ -63,6 +64,7 @@ class InspectionService:
             return obj
         except IntegrityError:
             await self._repository_inspection.session.rollback()
+            logger.exception("Ошибка в функции add_by_admin (IntegrityError)")
             raise DuplicatedError(
                 detail="Запись с такими уникальными атрибутами уже существует."
             )
@@ -112,12 +114,15 @@ class InspectionService:
             await self._repository_inspection.session.commit()
             await self._repository_inspection.session.refresh(inspection_obj)
             return cast(InspectionResponseDoctor, cast(Any, inspection_obj))
-        except IntegrityError as e:
-            print(e)
+        except IntegrityError:
+            logger.exception("Ошибка в функции add_by_doctor (IntegrityError)")
             await self._repository_inspection.session.rollback()
             raise DuplicatedError(
                 detail="Запись с такими уникальными атрибутами уже существует."
             )
+        except SQLAlchemyError:
+            logger.exception("Ошибка в функции add_by_doctor (SQLAlchemyError)")
+            raise
 
     async def patch_by_admin(
         self, id_: int, schema: InspectionUpdateAdmin
@@ -147,12 +152,14 @@ class InspectionService:
 
         except IntegrityError:
             await self._repository_inspection.session.rollback()
+            logger.exception("Ошибка в функции patch_by_admin (IntegrityError)")
             raise DuplicatedError(
                 detail="Обновление не выполнено из-за нарушения уникальности"
             )
-        except Exception as e:
+        except SQLAlchemyError:
             await self._repository_inspection.session.rollback()
-            raise e
+            logger.exception("Ошибка в функции patch_by_admin (SQLAlchemyError)")
+            raise
 
     async def patch_by_doctor(
         self, id_: int, schema: InspectionUpdateDoctor
@@ -234,12 +241,14 @@ class InspectionService:
             return cast(InspectionResponseDoctor, cast(Any, obj_inspection))
         except IntegrityError:
             await self._repository_inspection.session.rollback()
+            logger.exception("Ошибка в функции patch_by_doctor (IntegrityError)")
             raise DuplicatedError(
                 detail="Обновление не выполнено из-за нарушения уникальности"
             )
-        except Exception as e:
+        except SQLAlchemyError:
             await self._repository_inspection.session.rollback()
-            raise e
+            logger.exception("Ошибка в функции patch_by_doctor (SQLAlchemyError)")
+            raise
 
     async def inspection_per_day(self, schema: InspectionPerDateRequest) -> list:
         try:
@@ -247,9 +256,9 @@ class InspectionService:
                 schema.status, schema.start_date, schema.end_date
             )
             return data
-        except Exception as e:
-            print("inspection_per_day exception:", e)
-            raise e
+        except SQLAlchemyError:
+            logger.exception("Ошибка в функции inspection_per_day (SQLAlchemyError)")
+            raise
 
     async def diseases_per_patient(self, disease_ids_: list[int]) -> list:
         try:
@@ -257,9 +266,11 @@ class InspectionService:
                 disease_ids_
             )
             return data
-        except Exception as e:
-            print("diseases_per_patient exception:", e)
-            raise e
+        except SQLAlchemyError:
+            logger.exception(
+                f"Ошибка в функции diseases_per_patient с disease_ids_ = {disease_ids_}  (SQLAlchemyError)"
+            )
+            raise
 
     async def disease_per_patient(self, disease_id_: int) -> int:
         try:
@@ -267,6 +278,8 @@ class InspectionService:
                 disease_id_
             )
             return data
-        except Exception as e:
-            print("diseases_per_patient exception:", e)
-            raise e
+        except SQLAlchemyError:
+            logger.exception(
+                f"Ошибка пфункции disease_per_patient с disease_id_ = {disease_id_}  (SQLAlchemyError)"
+            )
+            raise

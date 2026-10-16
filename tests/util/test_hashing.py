@@ -1,20 +1,25 @@
 import pytest
-from util.hashing import get_password_hash, verify_password
+
+from app.util.hashing import (
+    get_password_hash,
+    verify_password,
+)
 
 
 @pytest.mark.parametrize(
-    'password',
+    "password",
     [
-        'Aa123456!',
-        'Русскиеbukv1',
-        '',
-    ]
+        "Aa123456!",
+        "Русскиеbukv1",
+        "",
+    ],
 )
 def test_password_success(password):
     hashed_password = get_password_hash(password)
     assert isinstance(hashed_password, str)
     assert hashed_password != password
     assert verify_password(password, hashed_password)
+
 
 @pytest.mark.parametrize(
     "password, wrong_password",

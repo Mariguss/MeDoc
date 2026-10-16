@@ -1,6 +1,4 @@
 from typing import (
-    Generic,
-    TypeVar,
     cast,
 )
 
@@ -12,10 +10,8 @@ from app.core.exception import NotFoundError
 from app.core.model.base import BaseWithId
 from app.repository.interface import ReadResult
 
-ModelT = TypeVar("ModelT", bound=BaseWithId)
 
-
-class BaseRepository(Generic[ModelT]):
+class BaseRepository[ModelT: BaseWithId]:
     def __init__(
         self,
         session: AsyncSession,
