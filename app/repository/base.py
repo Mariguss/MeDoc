@@ -76,9 +76,7 @@ class BaseRepository(Generic[ModelT]):
         result = await self.session.execute(stmt)
         obj = result.scalars().first()
         print("obj", obj)
-        if obj is not None:
-            return True
-        return False
+        return obj is not None
 
     async def all_exist(self, ids_: list[int]) -> bool:
         for id_ in ids_:
