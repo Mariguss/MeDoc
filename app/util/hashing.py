@@ -17,8 +17,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool | None:
             )
         )
     except TypeError as e:
-        logger.exception(f'Ошибка в функции verify_password (TypeError): {e}')
+        logger.exception(f"Ошибка в функции verify_password (TypeError): {e}")
         raise
     except ValueError as e:
-        logger.exception(f'Ошибка в функции verify_password (ValueError): {e}')
+        logger.exception(f"Ошибка в функции verify_password (ValueError): {e}")
         raise
