@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from core.config import settings
 from fastapi import (
     APIRouter,
     Cookie,
@@ -42,7 +43,7 @@ async def login(
     )
     return {
         "access_token": access_,
-        "token_type": "bearer",
+        "token_type": settings.token.TOKEN_TYPE,
         "expires_at": expire_at,
     }
 
@@ -67,6 +68,6 @@ async def refresh(
 
     return {
         "access_token": new_access,
-        "token_type": "bearer",
+        "token_type": settings.token.TOKEN_TYPE,
         "expires_at": new_expire,
     }
