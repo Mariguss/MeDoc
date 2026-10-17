@@ -15,10 +15,10 @@ def app() -> Generator[FastAPI]:
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(app: FastAPI, mock_auth_service) -> AsyncGenerator[AsyncClient]:
+async def client(app: FastAPI) -> AsyncGenerator[AsyncClient]:
     async with AsyncClient(
         transport=ASGITransport(app), base_url="http://testserver/"
     ) as client_:
         yield client_
 
-    app.dependency_overrides.clear()
+    app.dependency_overrides = {}
