@@ -8,10 +8,6 @@ from app.core.server import app
 async def root():
     return {"message": "Hello World, go to /docs"}
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
-
 
 @app.get("/health")
 async def health():
