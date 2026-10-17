@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from core.config import settings
 from fastapi import (
     APIRouter,
     Cookie,
@@ -10,6 +9,7 @@ from fastapi import (
 )
 from starlette import status
 
+from app.core.config import settings
 from app.core.dependencies import get_auth_service
 from app.core.exception import AuthError
 from app.core.schema.auth import (
