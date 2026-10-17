@@ -43,3 +43,4 @@ typing-extensions==4.16.0 ; python_version == "3.14"
 typing-inspection==0.4.4 ; python_version == "3.14"
 uvicorn==0.53.0 ; python_version == "3.14"
 asyncpg>=0.30
+loguru==0.7.3
