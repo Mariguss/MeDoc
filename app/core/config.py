@@ -38,7 +38,7 @@ class TokenSettings(BaseModel):
     secret_key: str | None = "SUPER_SECRET_KEY_ONLY_FOR_DEV_MODE"
     DATETIME_FORMAT: str = "%Y-%m-%dT%H:%M:%S"
     DATE_FORMAT: str = "%Y-%m-%d"
-    TOKEN_TYPE = "bearer" # nosec
+    TOKEN_TYPE = "bearer"  # nosec
 
 
 class Settings(BaseSettings):

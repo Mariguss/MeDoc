@@ -31,9 +31,9 @@ def upgrade() -> None:
 
     bind = op.get_bind()
     if bind.dialect.name == "postgresql":
-        sa.Enum(
-            "SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW", name="status"
-        ).create(bind, checkfirst=True)
+        sa.Enum("SCHEDULED", "COMPLETED", "CANCELLED", "NO_SHOW", name="status").create(
+            bind, checkfirst=True
+        )
 
     with op.batch_alter_table("inspections", schema=None) as batch_op:
         batch_op.add_column(
