@@ -1,2 +1,1 @@
-#[lint.flake8-bugbear]
-#extend-immutable-calls = ["fastapi.Depends"]
+extend-exclude = ["medoc-frontend"]
