@@ -1,3 +1,6 @@
+from typing import Annotated
+
+from core.config import settings
 from fastapi import (
     APIRouter,
     Cookie,
@@ -28,7 +31,7 @@ router = APIRouter(
 async def login(
     data: EmployeeAuth,
     response: Response,
-    service: AuthService = Depends(get_auth_service),
+    service: Annotated[AuthService, Depends(get_auth_service)],
 ):
     access_, refresh_, expire_at = await service.login(data)
     response.set_cookie(
@@ -40,7 +43,7 @@ async def login(
     )
     return {
         "access_token": access_,
-        "token_type": "bearer",
+        "token_type": settings.token.TOKEN_TYPE,
         "expires_at": expire_at,
     }
 
@@ -50,8 +53,8 @@ async def login(
     response_model=TokenResponse,
 )
 async def refresh(
+    service: Annotated[AuthService, Depends(get_auth_service)],
     refresh_token: str | None = Cookie(None),
-    service: AuthService = Depends(get_auth_service),
 ):
     if not refresh_token:
         raise HTTPException(
@@ -65,6 +68,6 @@ async def refresh(
 
     return {
         "access_token": new_access,
-        "token_type": "bearer",
+        "token_type": settings.token.TOKEN_TYPE,
         "expires_at": new_expire,
     }

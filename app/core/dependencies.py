@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from typing import Annotated
 
 from fastapi import (
     Depends,
@@ -24,72 +25,76 @@ from app.service.patient import PatientService
 
 
 async def get_employee_repository(
-    session: AsyncSession = Depends(database.get_session),
+    session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> EmployeeRepository:
     return EmployeeRepository(session)
 
 
 async def get_employee_service(
-    repo: EmployeeRepository = Depends(get_employee_repository),
+    repo: Annotated[EmployeeRepository, Depends(get_employee_repository)],
 ) -> EmployeeService:
     return EmployeeService(repo)
 
 
 async def get_patient_repository(
-    session: AsyncSession = Depends(database.get_session),
+    session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> PatientRepository:
     return PatientRepository(session)
 
 
 async def get_patient_service(
-    repo: PatientRepository = Depends(get_patient_repository),
+    repo: Annotated[PatientRepository, Depends(get_patient_repository)],
 ) -> PatientService:
     return PatientService(repo)
 
 
 async def get_medicine_repository(
-    session: AsyncSession = Depends(database.get_session),
+    session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> MedicineRepository:
     return MedicineRepository(session)
 
 
 async def get_medicine_service(
-    repo: MedicineRepository = Depends(get_medicine_repository),
+    repo: Annotated[MedicineRepository, Depends(get_medicine_repository)],
 ) -> MedicineService:
     return MedicineService(repo)
 
 
 async def get_inspection_repository(
-    session: AsyncSession = Depends(database.get_session),
+    session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> InspectionRepository:
     return InspectionRepository(session)
 
 
 async def get_disease_repository(
-    session: AsyncSession = Depends(database.get_session),
+    session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> DiseaseRepository:
     return DiseaseRepository(session)
 
 
 async def get_disease_service(
-    repo: DiseaseRepository = Depends(get_disease_repository),
+    repo: Annotated[DiseaseRepository, Depends(get_disease_repository)],
 ) -> DiseaseService:
     return DiseaseService(repo)
 
 
 async def get_prescription_repository(
-    session: AsyncSession = Depends(database.get_session),
+    session: Annotated[AsyncSession, Depends(database.get_session)],
 ) -> PrescriptionRepository:
     return PrescriptionRepository(session)
 
 
 async def get_inspection_service(
-    repo_inspection: InspectionRepository = Depends(get_inspection_repository),
-    repo_employee: EmployeeRepository = Depends(get_employee_repository),
-    repo_patient: PatientRepository = Depends(get_patient_repository),
-    repo_disease: DiseaseRepository = Depends(get_disease_repository),
-    repo_prescription: PrescriptionRepository = Depends(get_prescription_repository),
-    repo_medicine: MedicineRepository = Depends(get_medicine_repository),
+    repo_inspection: Annotated[
+        InspectionRepository, Depends(get_inspection_repository)
+    ],
+    repo_employee: Annotated[EmployeeRepository, Depends(get_employee_repository)],
+    repo_patient: Annotated[PatientRepository, Depends(get_patient_repository)],
+    repo_disease: Annotated[DiseaseRepository, Depends(get_disease_repository)],
+    repo_prescription: Annotated[
+        PrescriptionRepository, Depends(get_prescription_repository)
+    ],
+    repo_medicine: Annotated[MedicineRepository, Depends(get_medicine_repository)],
 ) -> InspectionService:
     return InspectionService(
         repo_inspection,
@@ -102,7 +107,7 @@ async def get_inspection_service(
 
 
 async def get_auth_service(
-    repo: EmployeeRepository = Depends(get_employee_repository),
+    repo: Annotated[EmployeeRepository, Depends(get_employee_repository)],
 ) -> AuthService:
     return AuthService(repo)
 
@@ -110,11 +115,13 @@ async def get_auth_service(
 auth_bearer = JWTBearer()
 
 
-def get_current_user(token_data: dict = Depends(auth_bearer)) -> dict:
+def get_current_user(token_data: Annotated[dict, Depends(auth_bearer)]) -> dict:
     return token_data
 
 
-def get_current_user_id(token_data: dict = Depends(auth_bearer)) -> int | None:
+def get_current_user_id(
+    token_data: Annotated[dict, Depends(auth_bearer)],
+) -> int | None:
     id_ = token_data.get("sub")
     print("id", id_)
     if id_ is None:
@@ -125,7 +132,9 @@ def get_current_user_id(token_data: dict = Depends(auth_bearer)) -> int | None:
     return id_
 
 
-def get_current_user_role(token_data: dict = Depends(auth_bearer)) -> str | None:
+def get_current_user_role(
+    token_data: Annotated[dict, Depends(auth_bearer)],
+) -> str | None:
     role_ = token_data.get("role")
     print("роль из токена:", role_)
     if role_ is None:

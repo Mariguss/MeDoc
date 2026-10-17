@@ -1,6 +1,4 @@
 from typing import (
-    Generic,
-    TypeVar,
     cast,
 )
 
@@ -12,10 +10,8 @@ from app.core.exception import NotFoundError
 from app.core.model.base import BaseWithId
 from app.repository.interface import ReadResult
 
-ModelT = TypeVar("ModelT", bound=BaseWithId)
 
-
-class BaseRepository(Generic[ModelT]):
+class BaseRepository[ModelT: BaseWithId]:
     def __init__(
         self,
         session: AsyncSession,
@@ -76,9 +72,7 @@ class BaseRepository(Generic[ModelT]):
         result = await self.session.execute(stmt)
         obj = result.scalars().first()
         print("obj", obj)
-        if obj is not None:
-            return True
-        return False
+        return obj is not None
 
     async def all_exist(self, ids_: list[int]) -> bool:
         for id_ in ids_:

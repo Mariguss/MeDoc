@@ -3,7 +3,6 @@ from abc import (
     abstractmethod,
 )
 from typing import (
-    Generic,
     TypedDict,
     TypeVar,
 )
@@ -11,12 +10,12 @@ from typing import (
 T = TypeVar("T")
 
 
-class ReadResult(TypedDict, Generic[T]):
+class ReadResult[T](TypedDict):
     founds: list[T]
     total_count: int
 
 
-class BaseRepositoryABC(Generic[T], ABC):
+class BaseRepositoryABC[T](ABC):
     @abstractmethod
     def _build_stmt_with_filters(self, stmt, **kwargs):
         pass

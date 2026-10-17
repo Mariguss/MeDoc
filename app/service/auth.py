@@ -1,7 +1,10 @@
-from fastapi import HTTPException
-from starlette import status
-
-from app.core.exception import NotFoundError
+from app.core.exception import (
+    AccessDeniedError,
+    NewException,
+    NotFoundError,
+    UnauthorizedError,
+    WrongCredentialsError,
+)
 from app.core.schema.auth import EmployeeAuth
 from app.core.security import (
     create_jwt_token,
@@ -21,35 +24,33 @@ class AuthService:
             if obj is None:
                 raise NotFoundError(detail=f"Запись с login {schema.login} не найдена.")
             if not verify_password(schema.password, obj.password_hash):
-                raise HTTPException(
-                    status.HTTP_401_UNAUTHORIZED
-                )  # смешение api и service логики?!!!
+                raise WrongCredentialsError("Неверный логин или пароль")
 
             subject = {"sub": str(obj.id), "role": str(obj.role.value)}
             access_token_, expire_at = create_jwt_token(subject)
             refresh_token_, _ = create_jwt_token(subject, type_="refresh")
             return access_token_, refresh_token_, expire_at
 
-        except Exception as e:
+        except NewException as e:
             print("login", e)
-            raise e
+            raise NewException
 
     async def refresh(self, refresh_token_: str) -> tuple[str, str]:
         payload = decode_jwt(refresh_token_)
         if payload is None:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise UnauthorizedError
 
         if payload.get("type") != "refresh":
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise UnauthorizedError
 
         user_id: int | None = payload.get("sub")
         user_role: str | None = payload.get("role")
 
         if user_id is None or user_role is None:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED)
+            raise UnauthorizedError
 
         if not await self._repository.exist(user_id):
-            raise HTTPException(status.HTTP_403_FORBIDDEN)
+            raise AccessDeniedError
 
         subject = {
             "sub": user_id,

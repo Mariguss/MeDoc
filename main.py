@@ -1,4 +1,5 @@
 import uvicorn
+from core.config import settings
 
 from app.core.server import app
 
@@ -13,4 +14,4 @@ async def health():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.5", port=8005, reload=True)
+    uvicorn.run("main:app", host=settings.run.host, port=settings.run.port, reload=True)

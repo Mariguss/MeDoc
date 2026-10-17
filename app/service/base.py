@@ -1,7 +1,6 @@
 # Для написания бизнес-логики (слой между repository и routes)
 from typing import (
     Any,
-    Generic,
     TypeVar,
     cast,
 )
@@ -17,12 +16,10 @@ from app.core.exception import (
 from app.core.model import Base
 from app.repository.interface import ReadResult
 
-DTOIn = TypeVar("DTOIn", bound=BaseModel)
-DTOOut = TypeVar("DTOOut", bound=BaseModel)
 ModelT = TypeVar("ModelT", bound=Base)
 
 
-class BaseService(Generic[DTOIn, DTOOut]):
+class BaseService[DTOIn: BaseModel, DTOOut: BaseModel]:
     def __init__(self, repository, model_class: type[Base]) -> None:
         self._repository = repository
         self._model_class = model_class
