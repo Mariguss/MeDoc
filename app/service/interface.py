@@ -2,20 +2,13 @@ from abc import (
     ABC,
     abstractmethod,
 )
-from typing import (
-    Generic,
-    TypeVar,
-)
 
 from pydantic import BaseModel
 
 from app.repository.interface import ReadResult
 
-DTOIn = TypeVar("DTOIn", bound=BaseModel)
-DTOOut = TypeVar("DTOOut", bound=BaseModel)
 
-
-class BaseServiceABC(Generic[DTOIn, DTOOut], ABC):
+class BaseServiceABC[DTOIn: BaseModel, DTOOut: BaseModel](ABC):
     @abstractmethod
     async def get_list(self, **kwargs) -> ReadResult[DTOOut]:
         pass

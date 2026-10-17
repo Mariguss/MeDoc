@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -27,7 +29,7 @@ router = APIRouter(
     status_code=200,
 )
 async def get_medicines(
-    service: MedicineService = Depends(get_medicine_service),
+    service: Annotated[MedicineService, Depends(get_medicine_service)],
     page: int = 1,
     page_size: int = 10,
     ordering: str = "-id",
@@ -46,7 +48,7 @@ async def get_medicines(
 )
 async def get_medicine(
     id_: int,
-    service: MedicineService = Depends(get_medicine_service),
+    service: Annotated[MedicineService, Depends(get_medicine_service)],
 ):
     employee = await service.get_by_id(id_)
     if employee is None:
@@ -61,7 +63,7 @@ async def get_medicine(
 )
 async def create_medicine(
     medicine: MedicineCreate,
-    service: MedicineService = Depends(get_medicine_service),
+    service: Annotated[MedicineService, Depends(get_medicine_service)],
 ) -> MedicineResponseAdmin:
     return await service.add(medicine)
 
@@ -73,7 +75,7 @@ async def create_medicine(
 async def update_medicine(
     id_: int,
     medicine: MedicineUpdate,
-    service: MedicineService = Depends(get_medicine_service),
+    service: Annotated[MedicineService, Depends(get_medicine_service)],
 ):
     return await service.patch(id_, medicine)
 
@@ -84,6 +86,6 @@ async def update_medicine(
 )
 async def delete_medicine(
     id_: int,
-    service: MedicineService = Depends(get_medicine_service),
+    service: Annotated[MedicineService, Depends(get_medicine_service)],
 ):
     return await service.remove_by_id(id_)

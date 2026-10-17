@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -27,7 +29,7 @@ router = APIRouter(
     status_code=200,
 )
 async def get_employees(
-    service: EmployeeService = Depends(get_employee_service),
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
     page: int = 1,
     page_size: int = 10,
     ordering: str = "-id",
@@ -46,7 +48,7 @@ async def get_employees(
 )
 async def get_employee(
     id_: int,
-    service: EmployeeService = Depends(get_employee_service),
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
 ):
     employee = await service.get_by_id(id_)
     if employee is None:
@@ -61,7 +63,7 @@ async def get_employee(
 )
 async def create_employee(
     employee: EmployeeCreate,
-    service: EmployeeService = Depends(get_employee_service),
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
 ) -> EmployeeResponseAdmin:
     return await service.add(employee)
 
@@ -73,7 +75,7 @@ async def create_employee(
 async def update_employee(
     id_: int,
     employee: EmployeeUpdate,
-    service: EmployeeService = Depends(get_employee_service),
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
 ):
     return await service.patch(id_, employee)
 
@@ -84,6 +86,6 @@ async def update_employee(
 )
 async def delete_employee(
     id_: int,
-    service: EmployeeService = Depends(get_employee_service),
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
 ):
     return await service.remove_by_id(id_)

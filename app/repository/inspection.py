@@ -9,7 +9,10 @@ from app.core.model import (
     Disease,
     InspectionDisease,
 )
-from app.core.model.inspection import Inspection, Status
+from app.core.model.inspection import (
+    Inspection,
+    Status,
+)
 
 T = TypeVar("T")
 
