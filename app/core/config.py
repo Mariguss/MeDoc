@@ -35,7 +35,7 @@ class TokenSettings(BaseModel):
     access_token_expire_seconds: float = 60 * 10
     refresh_token_expire_seconds: float = 60 * 60
 
-    secret_key: str | None = "SUPER_SECRET_KEY_ONLY_FOR_DEV_MODE"
+    secret_key: str = "SUPER_SECRET_KEY_ONLY_FOR_DEV_MODE"
     DATETIME_FORMAT: str = "%Y-%m-%dT%H:%M:%S"
     DATE_FORMAT: str = "%Y-%m-%d"
     TOKEN_TYPE = "bearer"  # nosec
