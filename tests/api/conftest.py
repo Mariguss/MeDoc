@@ -8,7 +8,7 @@ from httpx import ASGITransport, AsyncClient
 from app.core.server import create_app
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def app() -> Generator[FastAPI]:
     app_ = create_app()
     yield app_
@@ -21,4 +21,4 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient]:
     ) as client_:
         yield client_
 
-    app.dependency_overrides = {}
+    app.dependency_overrides.clear()
