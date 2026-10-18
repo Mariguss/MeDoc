@@ -45,11 +45,6 @@ payload_pagination: dict[str, Any] = {
 def mock_employee_service(app):
     register_exception_handlers(app)
     service = AsyncMock()
-    service.login.return_value = (
-        "fake_access_token",
-        "fake_refresh_token",
-        "2026-10-12T17:06:00",
-    )
 
     # Подменяем зависимость
     app.dependency_overrides[get_employee_service] = lambda: service
