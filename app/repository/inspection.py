@@ -1,43 +1,29 @@
 import datetime
 from typing import TypeVar
 
+from repository.base import BaseRepository
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import func
 
 from app.core.model import (
     Disease,
+    Inspection,
     InspectionDisease,
 )
 from app.core.model.inspection import (
-    Inspection,
     Status,
 )
 
 T = TypeVar("T")
 
 
-class InspectionRepository:
+class InspectionRepository(BaseRepository[Inspection]):
     def __init__(
         self,
         session: AsyncSession,
     ) -> None:
-        self.session = session
-        self._model = Inspection
-
-    async def create(self, obj_data: Inspection) -> Inspection:
-        self.session.add(obj_data)
-
-        return obj_data
-
-    async def update(self) -> None:
-        await self.session.flush()
-
-    async def read_by_id(self, id_: int) -> Inspection | None:
-        stmt = select(self._model).where(self._model.id == id_)
-        result = await self.session.execute(stmt)
-
-        return result.scalars().first()
+        super().__init__(session, Inspection)
 
     async def update_diseases(self, inspection_id: int, disease_ids: list[int]) -> None:
         await self.session.execute(
@@ -79,7 +65,10 @@ class InspectionRepository:
             {"date": row_.inspection_date, "count": row_.count} for row_ in result.all()
         ]
 
-    async def get_unique_patients_count_by_disease_id(self, disease_id_: int) -> int:
+    async def get_unique_patients_count_by_disease_id(
+            self,
+            disease_id_: int,
+    ) -> int:
         distinct_patients = func.distinct(Inspection.patient_id)
         count_expression = func.count(distinct_patients)
 
