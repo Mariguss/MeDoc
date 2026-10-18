@@ -15,7 +15,7 @@ from app.util.hashing import get_password_hash
 class EmployeeBase(BaseModel):
     login: Annotated[str, Field(min_length=5, max_length=15)]
     name: Annotated[str, Field(min_length=1, max_length=50)]
-    role: Role | None = Role.DOCTOR
+    role: Role # = Role.DOCTOR
     speciality: Annotated[str | None, Field(min_length=1, max_length=50)] = None
 
     @field_validator("login")
@@ -56,9 +56,20 @@ class EmployeeCreate(EmployeeBase):
         return get_password_hash(v)
 
 
-class EmployeeUpdate(EmployeeBase):
+class EmployeeUpdate(BaseModel):
+    login: Annotated[str | None, Field(min_length=5, max_length=15)] = None
+    name: Annotated[str | None, Field(min_length=1, max_length=50)] = None
     role: Role | None = None
     speciality: Annotated[str | None, Field(min_length=1, max_length=50)] = None
+
+    @field_validator("login")
+    @classmethod
+    def _validate_login(cls, v: str) -> str | None:
+        if v is None:
+            return v
+        elif not re.fullmatch(r"[a-zA-Z0-9_]+", v):
+            raise ValueError("Логин может содержать только латиницу, цифры и _")
+        return v
 
 
 class EmployeeQuery(BaseQuery):
