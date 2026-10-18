@@ -30,15 +30,20 @@ payload_get = {
     "instructions": None,
 }
 
-payload_add = {
-    "doctor_id": 2,
+payload_add_request = {
     "patient_id": 2,
     "inspection_at": None,
-    "created_at": "2026-07-09T00:00:00",
-    "updated_at": "2026-07-09T00:00:00",
     "address": "адрес больницы",
     "symptoms": None,
     "instructions": None,
+}
+
+payload_add_response = {
+    "id": 2,
+    "doctor_id": 1,
+    **payload_add_request,
+    "created_at": "2026-07-09T00:00:00",
+    "updated_at": "2026-07-09T00:00:00",
 }
 
 patch_inspection_at_payload = {"inspection_at": "2026-07-09T00:00:00"}
@@ -61,7 +66,7 @@ def mock_inspection_service(app):
 
     service.get_by_id.return_value = payload_get
 
-    service.add_by_doctor.return_value = {"id": 2, **payload_add}
+    service.add_by_doctor.return_value = payload_add_response
 
     service.patch_by_doctor.return_value = payload_patch
 
@@ -77,10 +82,11 @@ def mock_inspection_service(app):
 async def test_create_inspection_success(
     client: AsyncClient, mock_inspection_service: AsyncMock
 ) -> None:
-    response = await client.post("/inspection/doctor/", json=payload_add)
+    response = await client.post("/inspection/doctor/", json=payload_add_request)
 
     assert response.status_code == 201
     assert response.json()["id"] == 2
+    assert response.json()["doctor_id"] == 1
     mock_inspection_service.add_by_doctor.assert_called_once()
 
 # post /inspection/doctor 422
@@ -101,7 +107,7 @@ async def test_create_inspection_duplicate(
         detail="Запись с такими уникальными атрибутами уже существует."
     )
 
-    response = await client.post("/inspection/doctor/", json=payload_add)
+    response = await client.post("/inspection/doctor/", json=payload_add_request)
 
     assert response.status_code == 409
     assert "уникальными атрибутами" in response.json()["detail"]
@@ -122,11 +128,16 @@ async def test_update_inspection_success(
         1,
         InspectionUpdateDoctor(
             patient_id=None,
-            inspection_at=payload_patch.get('inspection_at'),
             address=None,
             symptoms=None,
             instructions=None,
-        )
+            status=None,
+            disease_ids=None,
+            prescriptions_update=None,
+            prescriptions_delete_ids=None,
+            prescriptions_create=None,
+            inspection_at=payload_patch.get("inspection_at"),
+        ),
     )
 
 # patch /inspection/doctor/1 404
