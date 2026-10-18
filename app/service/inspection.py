@@ -24,9 +24,7 @@ from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.repository.prescription import PrescriptionRepository
 
-T = TypeVar(
-    "T",
-)
+T = TypeVar("T")
 R = TypeVar("R")
 
 
@@ -49,6 +47,17 @@ class InspectionService:
 
         self._model_class = Inspection
 
+    async def get_by_id(self, id_: int):
+        pass
+
+    async def get_list(self,
+        page=1,
+        page_size=10,
+        ordering="-id",
+        **kwargs
+    ):
+        pass
+
     async def add_by_admin(self, schema: InspectionCreateAdmin):
         try:
             employee_ = await self._repository_employee.exist(schema.doctor_id)
@@ -62,12 +71,19 @@ class InspectionService:
             await self._repository_inspection.session.commit()
             await self._repository_inspection.session.refresh(obj)
             return obj
+        except NotFoundError:
+            await self._repository_inspection.session.rollback()
+            raise
         except IntegrityError:
             await self._repository_inspection.session.rollback()
             logger.exception("Ошибка в функции add_by_admin (IntegrityError)")
             raise DuplicatedError(
                 detail="Запись с такими уникальными атрибутами уже существует."
             )
+        except SQLAlchemyError:
+            logger.exception("Ошибка в функции add_by_admin (SQLAlchemyError)")
+            await self._repository_inspection.session.rollback()
+            raise
 
     async def add_by_doctor(
         self, schema: InspectionCreateDoctorInternal
@@ -89,7 +105,11 @@ class InspectionService:
                         detail="Один или несколько диагнозов не существует в таблице"
                     )
 
-            db_obj = self._model_class(**schema.model_dump())
+            inspection_data = schema.model_dump(
+                exclude={"disease_ids", "prescriptions_create"}
+            )
+            db_obj = self._model_class(**inspection_data)
+
             inspection_obj = await self._repository_inspection.create(db_obj)
             await self._repository_inspection.session.flush()
 
@@ -114,6 +134,9 @@ class InspectionService:
             await self._repository_inspection.session.commit()
             await self._repository_inspection.session.refresh(inspection_obj)
             return cast(InspectionResponseDoctor, cast(Any, inspection_obj))
+        except NotFoundError:
+            await self._repository_inspection.session.rollback()
+            raise
         except IntegrityError:
             logger.exception("Ошибка в функции add_by_doctor (IntegrityError)")
             await self._repository_inspection.session.rollback()
@@ -122,6 +145,7 @@ class InspectionService:
             )
         except SQLAlchemyError:
             logger.exception("Ошибка в функции add_by_doctor (SQLAlchemyError)")
+            await self._repository_inspection.session.rollback()
             raise
 
     async def patch_by_admin(
@@ -149,7 +173,9 @@ class InspectionService:
             await self._repository_inspection.session.commit()
             await self._repository_inspection.session.refresh(obj_inspection)
             return cast(InspectionResponseAdmin, cast(Any, obj_inspection))
-
+        except NotFoundError:
+            await self._repository_inspection.session.rollback()
+            raise
         except IntegrityError:
             await self._repository_inspection.session.rollback()
             logger.exception("Ошибка в функции patch_by_admin (IntegrityError)")
@@ -175,13 +201,11 @@ class InspectionService:
                 raise NotFoundError(detail=f"Запись с ID {id_} не найдена.")
 
             if schema.disease_ids:
-                disease_exists = await self._repository_disease.all_exist(
-                    schema.disease_ids
-                )
-                if not disease_exists:
-                    raise NotFoundError(
-                        detail="Один или несколько диагнозов не существует в таблице"
-                    )
+                for disease_id_ in schema.disease_ids:
+                    if not await self._repository_disease.exist(disease_id_):
+                        raise NotFoundError(
+                            detail="Один или несколько диагнозов не существует в таблице"
+                        )
 
             if schema.address is not None:
                 obj_inspection.address = schema.address
@@ -189,20 +213,18 @@ class InspectionService:
                 obj_inspection.symptoms = schema.symptoms
             if schema.instructions is not None:
                 obj_inspection.instructions = schema.instructions
+            
             # пересоздаем для inspections связи с болезнями
             if schema.disease_ids is not None:
                 await self._repository_inspection.update_diseases(
                     id_, schema.disease_ids
                 )
-            # удаляем нужные рецепты
+            # удаляем рецепты
             if schema.prescriptions_delete_ids is not None:
-                await self._repository_prescription.delete_all_by_id(
-                    schema.prescriptions_delete_ids
-                )
-
-            if (
-                schema.prescriptions_update is not None
-            ):  # проверить существуют ли лекарства
+                for prescriptions_delete_id_ in schema.prescriptions_delete_ids:
+                    await self._repository_prescription.delete_by_id(prescriptions_delete_id_)
+            # проверить существуют ли лекарства
+            if schema.prescriptions_update is not None:
                 for p_schema in schema.prescriptions_update:
                     db_prescription = await self._repository_prescription.read_by_id(
                         p_schema.id
@@ -211,14 +233,14 @@ class InspectionService:
                         raise NotFoundError(
                             detail=f"Рецепт с ID {p_schema.id} не найден."
                         )
-                    prescriptions_update_data = schema.model_dump(exclude_unset=True)
+                    prescriptions_update_data = p_schema.model_dump(exclude={"id"}, exclude_unset=True)
                     if prescriptions_update_data.get("medicine_id") is not None:
                         is_exist = await self._repository_medicine.exist(
                             prescriptions_update_data["medicine_id"]
                         )
                         if not is_exist:
                             raise NotFoundError(
-                                detail=f"В рецепте с id {prescriptions_update_data.get('id')} указано несуществующее лекарство"
+                                detail=f"В рецепте с id {p_schema.id} указано несуществующее лекарство"
                             )
                     for key, value in prescriptions_update_data.items():
                         setattr(db_prescription, key, value)
@@ -239,6 +261,9 @@ class InspectionService:
             await self._repository_inspection.session.commit()
             await self._repository_inspection.session.refresh(obj_inspection)
             return cast(InspectionResponseDoctor, cast(Any, obj_inspection))
+        except NotFoundError:
+            await self._repository_inspection.session.rollback()
+            raise
         except IntegrityError:
             await self._repository_inspection.session.rollback()
             logger.exception("Ошибка в функции patch_by_doctor (IntegrityError)")
