@@ -15,7 +15,7 @@ from app.util.hashing import get_password_hash
 class EmployeeBase(BaseModel):
     login: Annotated[str, Field(min_length=5, max_length=15)]
     name: Annotated[str, Field(min_length=1, max_length=50)]
-    role: Role # = Role.DOCTOR
+    role: Role  # = Role.DOCTOR
     speciality: Annotated[str | None, Field(min_length=1, max_length=50)] = None
 
     @field_validator("login")
