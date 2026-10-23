@@ -19,6 +19,8 @@ class PatientBase(BaseModel):
 
 
 class PatientResponse(PatientBase):
+    updated_at: datetime.datetime
+    created_at: datetime.datetime
     model_config = {"from_attributes": True}
 
 
