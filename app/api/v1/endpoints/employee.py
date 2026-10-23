@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
 )
 
 from app.core.dependencies import get_employee_service, required_roles
