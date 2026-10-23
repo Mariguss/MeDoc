@@ -5,8 +5,13 @@ from pydantic import (
 )
 
 from app.core.model.inspection import Status
+from app.core.schema.base import BaseQuery
+from app.core.schema.disease import DiseaseResponse
+from app.core.schema.employee import EmployeeResponse
+from app.core.schema.patient import PatientResponse
 from app.core.schema.prescription import (
     PrescriptionCreate,
+    PrescriptionResponse,
     PrescriptionUpdate,
 )
 
@@ -24,14 +29,23 @@ class InspectionResponse(BaseModel):
     inspection_at: datetime.datetime | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    address: str | None = None
+    address: str
     doctor_id: int
     patient_id: int
+    diseases: list[DiseaseResponse]
+    prescriptions: list[PrescriptionResponse]
+    patient: PatientResponse
+    doctor: EmployeeResponse
     model_config = {"from_attributes": True}
 
 
-class InspectionResponseAdmin(InspectionResponse):
-    id: int
+class InspectionResponseAdmin(BaseModel):
+    inspection_at: datetime.datetime | None = None
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    address: str
+    doctor_id: int
+    patient_id: int
 
 
 class InspectionResponseDoctor(InspectionResponseAdmin):
@@ -39,14 +53,36 @@ class InspectionResponseDoctor(InspectionResponseAdmin):
     instructions: str | None = None
 
 
-# class InspectionQuery(BaseQuery):
-#     date: datetime.datetime | None = None
-#     address: str | None = None
-#
-#
-# class InspectionQueryAdmin(InspectionQuery):
-#     doctor_id: int | None = None
-#     patient_id: int | None = None
+class InspectionQueryDoctor(BaseQuery):
+    inspection_at: datetime.datetime | None = None
+    created_at: datetime.datetime | None = None
+    updated_at: datetime.datetime | None = None
+    address: str | None = None
+    doctor_id: int | None = None
+    patient_id: int | None = None
+
+
+class InspectionQueryResponseDoctor(InspectionBase):
+    diseases: list[DiseaseResponse]
+    prescriptions: list[PrescriptionResponse]
+    doctor: EmployeeResponse
+    patient: PatientResponse
+    model_config = {"from_attributes": True}
+
+
+class InspectionQueryAdmin(BaseQuery):
+    inspection_at: datetime.datetime | None = None
+    created_at: datetime.datetime | None = None
+    updated_at: datetime.datetime | None = None
+    address: str | None = None
+    doctor_id: int | None = None
+    patient_id: int | None = None
+
+
+class InspectionQueryResponseAdmin(InspectionBase):
+    doctor: EmployeeResponse
+    patient: PatientResponse
+    model_config = {"from_attributes": True}
 
 
 class InspectionCreateAdmin(BaseModel):
