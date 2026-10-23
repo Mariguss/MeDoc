@@ -11,11 +11,16 @@ from app.core.dependencies import (
     get_inspection_service,
     required_roles,
 )
+from app.core.schema.base import PaginatedResponse
 from app.core.schema.inspection import (
     InspectionCreateAdmin,
     InspectionCreateDoctor,
     InspectionCreateDoctorInternal,
     InspectionPerDateRequest,
+    InspectionQueryAdmin,
+    InspectionQueryDoctor,
+    InspectionQueryResponseAdmin,
+    InspectionQueryResponseDoctor,
     InspectionResponse,
     InspectionResponseAdmin,
     InspectionResponseDoctor,
@@ -23,7 +28,6 @@ from app.core.schema.inspection import (
     InspectionUpdateDoctor,
 )
 from app.service.inspection import InspectionService
-from core.schema.base import PaginatedResponse
 
 router = APIRouter(
     prefix="/inspection",
@@ -31,43 +35,56 @@ router = APIRouter(
     dependencies=[Depends(auth_bearer)],
 )
 
-# Добавьте HTTPException в импорты из fastapi, если его там еще нет
-from fastapi import APIRouter, Depends, HTTPException
 
-# 1. Получение списка осмотров с фильтрацией и пагинацией (Доступно и админам, и врачам)
-@router.get(
-    "/",
-    response_model=PaginatedResponse[InspectionResponseAdmin], # Укажите вашу схему пагинации
-    status_code=200,
+@router.patch(
+    "/doctor/",
+    response_model=PaginatedResponse[InspectionQueryResponseDoctor],
 )
-async def get_inspections(
+async def get_inspections_by_doctor(
     service: Annotated[InspectionService, Depends(get_inspection_service)],
-    page: int = 1,
-    page_size: int = 10,
-    ordering: str = "-id",
-    doctor_id: int | None = None,
-    patient_id: int | None = None,
+    inspection_query: InspectionQueryDoctor,
+    _role: str = Depends(required_roles(["doctor"])),
 ):
-    # Метод get_list в вашем BaseService / InspectionService уже умеет принимать kwargs
-    return await service.get_list(
-        page=page,
-        page_size=page_size,
-        ordering=ordering,
-        doctor_id=doctor_id,
-        patient_id=patient_id,
-    )
+    return await service.get_list(**inspection_query.model_dump(exclude_unset=True))
+
+
+@router.patch(
+    "/admin/",
+    response_model=PaginatedResponse[InspectionQueryResponseAdmin],
+)
+async def get_inspections_by_admin(
+    service: Annotated[InspectionService, Depends(get_inspection_service)],
+    inspection_query: InspectionQueryAdmin,
+    _role: str = Depends(required_roles(["admin"])),
+):
+    return await service.get_list(**inspection_query.model_dump(exclude_unset=True))
 
 
 @router.get(
-    "/{id_}",
-    response_model=InspectionResponseDoctor,
+    "/doctor/{id_}",
+    response_model=InspectionResponse,
     status_code=200,
 )
-async def get_inspection(
+async def get_inspection_by_doctor(
     id_: int,
     service: Annotated[InspectionService, Depends(get_inspection_service)],
-):
+    _role: str = Depends(required_roles(["doctor"])),
+) -> InspectionResponse:
     return await service.get_by_id(id_)
+
+
+@router.get(
+    "/admin/{id_}",
+    response_model=InspectionResponseAdmin,
+    status_code=200,
+)
+async def get_inspection_by_admin(
+    id_: int,
+    service: Annotated[InspectionService, Depends(get_inspection_service)],
+    _role: str = Depends(required_roles(["admin"])),
+) -> InspectionResponseAdmin:
+    return await service.get_by_id(id_)
+
 
 @router.post(
     "/admin/",
