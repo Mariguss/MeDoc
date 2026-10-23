@@ -136,7 +136,6 @@ def get_current_user_role(
     token_data: Annotated[dict, Depends(auth_bearer)],
 ) -> str | None:
     role_ = token_data.get("role")
-    print("роль из токена:", role_)
     if role_ is None:
         raise HTTPException(
             detail="Роль пользователя не найдена",
@@ -147,7 +146,6 @@ def get_current_user_role(
 
 def required_roles(allowed_roles: list[str]) -> Callable:
     def role_checker(role: str = Depends(get_current_user_role)):
-        print("role->", role, "allowed->", allowed_roles)
         if role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
