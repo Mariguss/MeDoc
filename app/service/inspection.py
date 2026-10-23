@@ -23,12 +23,13 @@ from app.repository.inspection import InspectionRepository
 from app.repository.medicine import MedicineRepository
 from app.repository.patient import PatientRepository
 from app.repository.prescription import PrescriptionRepository
+from app.service.base import BaseService
 
 T = TypeVar("T")
 R = TypeVar("R")
 
 
-class InspectionService:
+class InspectionService(BaseService):
     def __init__(
         self,
         repository_inspection: InspectionRepository,
@@ -38,6 +39,7 @@ class InspectionService:
         repository_prescription: PrescriptionRepository,
         repository_medicine: MedicineRepository,
     ) -> None:
+        super().__init__(repository_inspection, Inspection)
         self._repository_inspection = repository_inspection
         self._repository_employee = repository_employee
         self._repository_patient = repository_patient
@@ -46,17 +48,6 @@ class InspectionService:
         self._repository_medicine = repository_medicine
 
         self._model_class = Inspection
-
-    async def get_by_id(self, id_: int):
-        pass
-
-    async def get_list(self,
-        page=1,
-        page_size=10,
-        ordering="-id",
-        **kwargs
-    ):
-        pass
 
     async def add_by_admin(self, schema: InspectionCreateAdmin):
         try:
@@ -67,7 +58,7 @@ class InspectionService:
             if not patient_:
                 raise NotFoundError(detail="Пациент не найден")
             db_obj = self._model_class(**schema.model_dump())
-            obj = await self._repository_inspection.create(db_obj)
+            obj = await self._repository_inspection.create(cast(Inspection, db_obj))
             await self._repository_inspection.session.commit()
             await self._repository_inspection.session.refresh(obj)
             return obj
@@ -110,7 +101,9 @@ class InspectionService:
             )
             db_obj = self._model_class(**inspection_data)
 
-            inspection_obj = await self._repository_inspection.create(db_obj)
+            inspection_obj = await self._repository_inspection.create(
+                cast(Inspection, db_obj)
+            )
             await self._repository_inspection.session.flush()
 
             # создаем для inspections связи с болезнями
@@ -213,7 +206,7 @@ class InspectionService:
                 obj_inspection.symptoms = schema.symptoms
             if schema.instructions is not None:
                 obj_inspection.instructions = schema.instructions
-            
+
             # пересоздаем для inspections связи с болезнями
             if schema.disease_ids is not None:
                 await self._repository_inspection.update_diseases(
@@ -222,7 +215,9 @@ class InspectionService:
             # удаляем рецепты
             if schema.prescriptions_delete_ids is not None:
                 for prescriptions_delete_id_ in schema.prescriptions_delete_ids:
-                    await self._repository_prescription.delete_by_id(prescriptions_delete_id_)
+                    await self._repository_prescription.delete_by_id(
+                        prescriptions_delete_id_
+                    )
             # проверить существуют ли лекарства
             if schema.prescriptions_update is not None:
                 for p_schema in schema.prescriptions_update:
@@ -233,7 +228,9 @@ class InspectionService:
                         raise NotFoundError(
                             detail=f"Рецепт с ID {p_schema.id} не найден."
                         )
-                    prescriptions_update_data = p_schema.model_dump(exclude={"id"}, exclude_unset=True)
+                    prescriptions_update_data = p_schema.model_dump(
+                        exclude={"id"}, exclude_unset=True
+                    )
                     if prescriptions_update_data.get("medicine_id") is not None:
                         is_exist = await self._repository_medicine.exist(
                             prescriptions_update_data["medicine_id"]
