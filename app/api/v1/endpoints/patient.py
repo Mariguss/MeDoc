@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
 )
 
 from app.core.dependencies import (
@@ -54,6 +53,7 @@ async def get_patient(
     service: Annotated[PatientService, Depends(get_patient_service)],
 ):
     return await service.get_by_id(id_)
+
 
 @router.post(
     "/",
