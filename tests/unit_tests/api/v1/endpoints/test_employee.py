@@ -21,7 +21,7 @@ payload_get = {
     "login": "fake_login1",
     "name": "Иванов Иван Иванович",
     "role": "doctor",
-    "speciality": "ЛОР"
+    "speciality": "ЛОР",
 }
 
 payload_add = {
@@ -29,7 +29,7 @@ payload_add = {
     "name": "Новый Работник",
     "role": "admin",
     "speciality": "ЛОР",
-    "password": "SecurePassword1!"
+    "password": "SecurePassword1!",
 }
 
 patch_name_payload = {"name": "Петров Иван Иванович"}
@@ -40,6 +40,7 @@ payload_pagination: dict[str, Any] = {
     "founds": [payload_get],
     "total_count": 15,
 }
+
 
 @pytest.fixture(scope="function", autouse=True)
 def mock_employee_service(app):
@@ -67,7 +68,9 @@ def mock_employee_service(app):
 
 # get /employee/1 200
 @pytest.mark.asyncio
-async def test_get_employee(client: AsyncClient, mock_employee_service: AsyncMock) -> None:
+async def test_get_employee(
+    client: AsyncClient, mock_employee_service: AsyncMock
+) -> None:
     response = await client.get("/employee/1")
 
     assert response.status_code == 200
@@ -81,9 +84,12 @@ async def test_get_employee(client: AsyncClient, mock_employee_service: AsyncMoc
     # Проверяем, что эндпоинт передал в сервис правильный ID (целое число, а не строку)
     mock_employee_service.get_by_id.assert_called_once_with(1)
 
+
 # get /employee/1 404
 @pytest.mark.asyncio
-async def test_get_employee_not_found(client: AsyncClient, mock_employee_service: AsyncMock) -> None:
+async def test_get_employee_not_found(
+    client: AsyncClient, mock_employee_service: AsyncMock
+) -> None:
     mock_employee_service.get_by_id.side_effect = NotFoundError(
         detail="Работник не найден"
     )
@@ -94,14 +100,18 @@ async def test_get_employee_not_found(client: AsyncClient, mock_employee_service
     assert response.json()["detail"] == "Работник не найден"
     mock_employee_service.get_by_id.assert_called_once_with(1)
 
+
 # get /employee/{str} 422
 @pytest.mark.asyncio
-async def test_get_employee_invalid_id_type(client: AsyncClient, mock_employee_service: AsyncMock) -> None:
+async def test_get_employee_invalid_id_type(
+    client: AsyncClient, mock_employee_service: AsyncMock
+) -> None:
     response = await client.get("/employee/not-a-number")
 
     assert response.status_code == 422
     # Сервис вообще не должен вызываться, так как валидация упала на уровне FastAPI
     mock_employee_service.get_by_id.assert_not_called()
+
 
 # post /employee/ 201
 @pytest.mark.asyncio
@@ -114,14 +124,18 @@ async def test_create_employee_success(
     assert response.json()["id"] == 2
     mock_employee_service.add.assert_called_once()
 
+
 # post /employee/ 422
 @pytest.mark.asyncio
-async def test_create_employee_invalid_body(client: AsyncClient, mock_employee_service: AsyncMock) -> None:
+async def test_create_employee_invalid_body(
+    client: AsyncClient, mock_employee_service: AsyncMock
+) -> None:
     response = await client.post("/employee/", json={})
 
     assert response.status_code == 422
     assert "detail" in response.json()
     mock_employee_service.add.assert_not_called()
+
 
 # post /employee/ 409 (Дубликат, например, по номеру телефона)
 @pytest.mark.asyncio
@@ -137,6 +151,7 @@ async def test_create_employee_duplicate(
     assert response.status_code == 409
     assert "уникальными атрибутами" in response.json()["detail"]
 
+
 # patch /employee/1 200
 @pytest.mark.asyncio
 async def test_update_employee_success(
@@ -151,8 +166,11 @@ async def test_update_employee_success(
 
     mock_employee_service.patch.assert_called_once_with(
         1,
-        EmployeeUpdate(login=None, name="Петров Иван Иванович", role=None, speciality=None)
+        EmployeeUpdate(
+            login=None, name="Петров Иван Иванович", role=None, speciality=None
+        ),
     )
+
 
 # patch /employee/1 404
 @pytest.mark.asyncio
@@ -160,12 +178,15 @@ async def test_update_employee_not_found(
     client: AsyncClient, mock_employee_service: AsyncMock
 ) -> None:
     # Имитируем, что сервис выбросил NotFoundError
-    mock_employee_service.patch.side_effect = NotFoundError(detail="Запись с ID 1 не найдена.")
+    mock_employee_service.patch.side_effect = NotFoundError(
+        detail="Запись с ID 1 не найдена."
+    )
 
     response = await client.patch("/employee/1", json=patch_name_payload)
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Запись с ID 1 не найдена."
+
 
 # get /employee/ 200
 @pytest.mark.asyncio
@@ -182,33 +203,40 @@ async def test_get_employees_list_pagination(
     # Проверяем структуру PaginatedResponse
     assert "founds" in data
     assert len(data["founds"]) == len(payload_pagination["founds"])
-    assert data["founds"][0]["name"] == payload_get.get('name')
-    assert data["total_count"] == payload_pagination.get('total_count')
+    assert data["founds"][0]["name"] == payload_get.get("name")
+    assert data["total_count"] == payload_pagination.get("total_count")
 
     mock_employee_service.get_list.assert_called_once_with(
         page=1, page_size=1, ordering="name"
     )
 
+
 # delete /employee/1 204
 @pytest.mark.asyncio
-async def test_delete_employee_success(client: AsyncClient, mock_employee_service: AsyncMock) -> None:
+async def test_delete_employee_success(
+    client: AsyncClient, mock_employee_service: AsyncMock
+) -> None:
     response = await client.delete("/employee/1")
 
     assert response.status_code == 204
     assert response.content == b""
     mock_employee_service.remove_by_id.assert_called_once_with(1)
 
+
 # delete /employee/1 404
 @pytest.mark.asyncio
 async def test_delete_employee_not_found(
     client: AsyncClient, mock_employee_service: AsyncMock
 ) -> None:
-    mock_employee_service.remove_by_id.side_effect = NotFoundError(detail="Запись с таким id не найдена")
+    mock_employee_service.remove_by_id.side_effect = NotFoundError(
+        detail="Запись с таким id не найдена"
+    )
 
     response = await client.delete("/employee/1")
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Запись с таким id не найдена"
+
 
 # delete /employee/1 409 (Есть привязанные данные в других таблицах)
 @pytest.mark.asyncio
