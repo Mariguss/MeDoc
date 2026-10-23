@@ -17,7 +17,12 @@ from app.core.model.base import BaseWithId
 from app.core.model.mixin import CreatedAtMixin, UpdatedAtMixin
 
 if TYPE_CHECKING:
-    from app.core.model.disease import Disease
+    from app.core.model import (
+        Disease,
+        Employee,
+        Patient,
+        Prescription,
+    )
 
 
 class Status(str, enum.Enum):
@@ -53,4 +58,12 @@ class Inspection(BaseWithId, CreatedAtMixin, UpdatedAtMixin):
         "Disease",
         secondary="inspectiondiseases",
         back_populates="inspections",
+        lazy="selectin",
     )
+
+    prescriptions: Mapped[list[Prescription]] = relationship(
+        "Prescription", lazy="selectin"
+    )
+
+    patient: Mapped[Patient] = relationship("Patient", lazy="selectin")
+    doctor: Mapped[Employee] = relationship("Employee", lazy="selectin")
