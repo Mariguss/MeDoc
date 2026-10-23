@@ -1,7 +1,6 @@
 import datetime
 from typing import TypeVar
 
-from repository.base import BaseRepository
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import func
@@ -14,6 +13,7 @@ from app.core.model import (
 from app.core.model.inspection import (
     Status,
 )
+from app.repository.base import BaseRepository
 
 T = TypeVar("T")
 
@@ -66,8 +66,8 @@ class InspectionRepository(BaseRepository[Inspection]):
         ]
 
     async def get_unique_patients_count_by_disease_id(
-            self,
-            disease_id_: int,
+        self,
+        disease_id_: int,
     ) -> int:
         distinct_patients = func.distinct(Inspection.patient_id)
         count_expression = func.count(distinct_patients)
