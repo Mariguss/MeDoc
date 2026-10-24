@@ -22,6 +22,8 @@ fake_doctor = {
     "login": "doctor_test",
     "name": "Гуссер Мария Александровна",
     "speciality": "ЛОР",
+    "created_at": "2026-10-23T18:00:00",
+    "updated_at": "2026-10-23T18:00:00",
 }
 
 fake_patient = {
@@ -30,6 +32,8 @@ fake_patient = {
     "phone_number": "79991112233",
     "born_date": "2006-09-23",
     "home_address": "домашний адрес",
+    "created_at": "2026-10-24T12:00:00",
+    "updated_at": "2026-10-24T12:00:00",
 }
 
 payload_get: dict[str, Any] = {
