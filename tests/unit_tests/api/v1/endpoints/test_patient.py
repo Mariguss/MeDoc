@@ -23,6 +23,8 @@ payload_get = {
     "phone_number": "89041231123",
     "born_date": "2000-10-12",
     "home_address": "г. Москва, ул. Морозова, д. 22, кв. 20",
+    "created_at": "2026-10-24T12:00:00",
+    "updated_at": "2026-10-24T12:00:00",
 }
 
 payload_add = {
@@ -54,7 +56,12 @@ def mock_patient_service(app):
 
     service.get_by_id.return_value = payload_get
 
-    service.add.return_value = {"id": 2, **payload_add}
+    service.add.return_value = {
+        "id": 2,
+        **payload_add,
+        "created_at": "2026-10-24T12:00:00",
+        "updated_at": "2026-10-24T12:00:00",
+    }
 
     service.patch.return_value = payload_patch
 
