@@ -77,3 +77,21 @@ def as_admin(app):
     app.dependency_overrides[get_current_user_id] = lambda: 1
     yield
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def admin_client(client, app):
+    app.dependency_overrides[auth_bearer] = lambda: 1
+    app.dependency_overrides[get_current_user_role] = lambda: "admin"
+    app.dependency_overrides[get_current_user_id] = lambda: 1
+    yield client
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def doctor_client(client, app):
+    app.dependency_overrides[auth_bearer] = lambda: 1
+    app.dependency_overrides[get_current_user_role] = lambda: "doctor"
+    app.dependency_overrides[get_current_user_id] = lambda: 1
+    yield client
+    app.dependency_overrides.clear()
