@@ -2,9 +2,9 @@ import datetime
 from copy import copy
 
 import pytest
-from util.hashing import get_password_hash
 
 from app.core.model import Employee, Inspection, Patient
+from app.util.hashing import get_password_hash
 
 inspection_add = {
     "inspection_at": None,
@@ -27,25 +27,16 @@ doctor_add = {
     "speciality": "ЛОР",
 }
 
-disease_add = {
-    "name": "Простуда",
-}
-
-medicine_add = {
-    "name": "Ношпа",
-    "properties": "Описание",
-    "side_effects": "Эффекты",
-}
 
 @pytest.mark.asyncio
 async def test_create_item(client, session, as_admin):
     add_data = copy(inspection_add)
-    
+
     response_patient = await client.post("/patient/", json=patient_add)
     assert response_patient.status_code == 201
     patient_id = response_patient.json()["id"]
     add_data["patient_id"] = patient_id
-    
+
     response_doctor = await client.post("/employee/", json=doctor_add)
     assert response_doctor.status_code == 201
     doctor_id = response_doctor.json()["id"]
@@ -59,7 +50,6 @@ async def test_create_item(client, session, as_admin):
     assert data["patient_id"] == patient_id
     assert data["inspection_at"] == inspection_add["inspection_at"]
     assert data["address"] == inspection_add["address"]
-
 
 
 @pytest.mark.asyncio
@@ -79,7 +69,9 @@ async def test_read_item(session, client, as_admin):
     await session.flush()
     patient_id = test_patient.id
 
-    test_inspection = Inspection(**inspection_add, doctor_id=doctor_id, patient_id=patient_id)
+    test_inspection = Inspection(
+        **inspection_add, doctor_id=doctor_id, patient_id=patient_id
+    )
     session.add(test_inspection)
     await session.flush()
     inspection_id = test_inspection.id

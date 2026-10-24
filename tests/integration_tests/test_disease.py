@@ -6,6 +6,7 @@ payload_add = {
     "name": "Простуда",
 }
 
+
 @pytest.mark.asyncio
 async def test_create_item(client, as_admin):
     response = await client.post("/disease/", json=payload_add)

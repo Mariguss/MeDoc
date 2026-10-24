@@ -8,6 +8,7 @@ payload_add = {
     "side_effects": "Эффекты",
 }
 
+
 @pytest.mark.asyncio
 async def test_create_item(client, as_admin):
     response = await client.post("/medicine/", json=payload_add)
