@@ -1,3 +1,4 @@
+import datetime
 import re
 from typing import Annotated
 
@@ -37,6 +38,8 @@ class EmployeeResponse(BaseModel):
 class EmployeeResponseAdmin(EmployeeResponse):
     id: int
     role: Role
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
 
 class EmployeeCreate(EmployeeBase):
