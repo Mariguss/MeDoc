@@ -40,6 +40,7 @@ class InspectionResponse(BaseModel):
 
 
 class InspectionResponseAdmin(BaseModel):
+    id: int
     inspection_at: datetime.datetime | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime
