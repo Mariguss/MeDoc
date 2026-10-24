@@ -21,6 +21,8 @@ fake_doctor = {
     "login": "admin_test",
     "name": "Иванов Иван Иванович",
     "speciality": "Терапевт",
+    "created_at": "2026-10-23T18:00:00",
+    "updated_at": "2026-10-23T18:00:00",
 }
 
 fake_patient = {
@@ -29,6 +31,8 @@ fake_patient = {
     "phone_number": "79991112233",
     "born_date": "1990-01-01",
     "home_address": "Москва",
+    "created_at": "2026-10-23T18:00:00",
+    "updated_at": "2026-10-23T18:00:00",
 }
 
 payload_get = {
@@ -73,7 +77,12 @@ def mock_inspection_service(app):
     app.dependency_overrides[auth_bearer] = lambda: {"role": "admin"}
 
     service.get_by_id.return_value = payload_get
-    service.add_by_admin.return_value = {"id": 2, **payload_add}
+    service.add_by_admin.return_value = {
+        "id": 2,
+        **payload_add,
+        "created_at": "2026-10-24T12:00:00",
+        "updated_at": "2026-10-24T12:00:00",
+    }
     service.patch_by_admin.return_value = payload_patch
     service.get_list.return_value = payload_pagination
 
