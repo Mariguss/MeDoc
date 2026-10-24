@@ -22,6 +22,8 @@ payload_get = {
     "name": "Иванов Иван Иванович",
     "role": "doctor",
     "speciality": "ЛОР",
+    "created_at": "2026-10-24T12:00:00",
+    "updated_at": "2026-10-24T12:00:00",
 }
 
 payload_add = {
@@ -53,7 +55,12 @@ def mock_employee_service(app):
 
     service.get_by_id.return_value = payload_get
 
-    service.add.return_value = {"id": 2, **payload_add}
+    service.add.return_value = {
+        "id": 2,
+        **payload_add,
+        "created_at": "2026-10-24T12:00:00",
+        "updated_at": "2026-10-24T12:00:00",
+    }
 
     service.patch.return_value = payload_patch
 
