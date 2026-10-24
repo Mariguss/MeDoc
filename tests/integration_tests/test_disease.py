@@ -2,13 +2,16 @@ import pytest
 
 from app.core.model import Disease
 
+payload_add = {
+    "name": "Простуда",
+}
 
 @pytest.mark.asyncio
 async def test_create_item(client, as_admin):
-    response = await client.post("/disease/", json={"name": "Простуда"})
+    response = await client.post("/disease/", json=payload_add)
     assert response.status_code == 201
     data = response.json()
-    assert data["name"] == "Простуда"
+    assert data["name"] == payload_add["name"]
     assert "id" in data
 
 
