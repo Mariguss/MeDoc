@@ -71,7 +71,6 @@ class BaseRepository[ModelT: BaseWithId]:
         stmt = select(self._model).where(self._model.id == id_)
         result = await self.session.execute(stmt)
         obj = result.scalars().first()
-        print("obj", obj)
         return obj is not None
 
     async def all_exist(self, ids_: list[int]) -> bool:
