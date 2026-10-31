@@ -106,7 +106,7 @@ async def test_create_item_404_doctor(client, session, as_admin):
     add_data["doctor_id"] = doctor_id + 100
     response_2 = await client.post("/inspection/admin/", json=add_data)
     assert response_2.status_code == 404
-    assert "Доктор" in response_2.json()["detail"]
+    assert "Пациент" in response_2.json()["detail"]
 
 
 @pytest.mark.asyncio
