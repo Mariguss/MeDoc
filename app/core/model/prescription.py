@@ -7,13 +7,14 @@ from sqlalchemy import (
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
+    relationship,
 )
 
 from app.core.model.base import BaseWithId
 from app.core.model.mixin.updated_at import UpdatedAtMixin
 
 if TYPE_CHECKING:
-    ...
+    from app.core.model import Medicine
 
 
 class Prescription(BaseWithId, UpdatedAtMixin):
@@ -34,3 +35,8 @@ class Prescription(BaseWithId, UpdatedAtMixin):
 
     intake_method: Mapped[str]
     note: Mapped[str | None]
+
+    medicine: Mapped[Medicine] = relationship(
+        "Medicine",
+        lazy="selectin",
+    )

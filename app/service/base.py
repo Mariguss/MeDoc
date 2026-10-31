@@ -48,15 +48,15 @@ class BaseService[DTOIn: BaseModel, DTOOut: BaseModel]:
             )
 
     async def patch(self, id_: int, schema: DTOIn) -> DTOOut:
+        obj = await self._repository.read_by_id(id_)
+        if obj is None:
+            raise NotFoundError(detail=f"Запись с ID {id_} не найдена.")
         try:
-            obj = await self._repository.read_by_id(id_)
-            if obj is None:
-                raise NotFoundError(detail=f"Запись с ID {id_} не найдена.")
             update_data = schema.model_dump(exclude_unset=True)
             for key, value in update_data.items():
                 setattr(obj, key, value)
 
-            await self._repository.session.update()
+            await self._repository.update()
 
             await self._repository.session.commit()
             await self._repository.session.refresh(obj)
@@ -68,7 +68,13 @@ class BaseService[DTOIn: BaseModel, DTOOut: BaseModel]:
                 detail="Обновление не выполнено из-за нарушения уникальности"
             )
 
+    # TODO: убрать с репозитория логику, оставить только функции
     async def remove_by_id(self, id_: int) -> None:
+        # obj = await self._repository.read_by_id(id_)
+        # if obj is None:
+        #     raise NotFoundError(
+        #         detail="Запись с таким id не найдена"
+        #     )
         try:
             await self._repository.delete_by_id(id_)
             await self._repository.session.commit()

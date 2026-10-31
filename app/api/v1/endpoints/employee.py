@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
 )
 
 from app.core.dependencies import get_employee_service, required_roles
@@ -50,10 +49,7 @@ async def get_employee(
     id_: int,
     service: Annotated[EmployeeService, Depends(get_employee_service)],
 ):
-    employee = await service.get_by_id(id_)
-    if employee is None:
-        raise HTTPException(status_code=404, detail="Сотрудник не найден")
-    return employee
+    return await service.get_by_id(id_)
 
 
 @router.post(

@@ -11,11 +11,16 @@ from app.core.dependencies import (
     get_inspection_service,
     required_roles,
 )
+from app.core.schema.base import PaginatedResponse
 from app.core.schema.inspection import (
     InspectionCreateAdmin,
     InspectionCreateDoctor,
     InspectionCreateDoctorInternal,
     InspectionPerDateRequest,
+    InspectionQueryAdmin,
+    InspectionQueryDoctor,
+    InspectionQueryResponseAdmin,
+    InspectionQueryResponseDoctor,
     InspectionResponse,
     InspectionResponseAdmin,
     InspectionResponseDoctor,
@@ -30,40 +35,55 @@ router = APIRouter(
     dependencies=[Depends(auth_bearer)],
 )
 
-#
-# @router.get(
-#     "/",
-#     response_model=PaginatedResponse[InspectionResponse],
-#     status_code=200,
-# )
-# async def get_inspections(
-#         service: InspectionService = Depends(get_inspection_service),
-#         page: int = 1,
-#         page_size: int = 10,
-#         ordering: str = "-id",
-#         doctor_id: int | None = None,
-#         patient_id: int | None = None,
-# ):
-#     return await service.get_list(
-#         page=page,
-#         page_size=page_size,
-#         ordering=ordering,
-#         doctor_id=doctor_id,
-#         patient_id=patient_id,
-#     )
-# @router.get(
-#     "/{id_}",
-#     response_model=InspectionResponseAdmin,
-#     status_code=200,
-# )
-# async def get_inspection(
-#         id_: int,
-#         service: InspectionService = Depends(get_inspection_service),
-# ):
-#     employee = await service.get_by_id(id_)
-#     if employee is None:
-#         raise HTTPException(status_code=404, detail="Запись не найдена")
-#     return employee
+
+@router.patch(
+    "/doctor/",
+    response_model=PaginatedResponse[InspectionQueryResponseDoctor],
+)
+async def get_inspections_by_doctor(
+    service: Annotated[InspectionService, Depends(get_inspection_service)],
+    inspection_query: InspectionQueryDoctor,
+    _role: str = Depends(required_roles(["doctor"])),
+):
+    return await service.get_list(**inspection_query.model_dump(exclude_unset=True))
+
+
+@router.patch(
+    "/admin/",
+    response_model=PaginatedResponse[InspectionQueryResponseAdmin],
+)
+async def get_inspections_by_admin(
+    service: Annotated[InspectionService, Depends(get_inspection_service)],
+    inspection_query: InspectionQueryAdmin,
+    _role: str = Depends(required_roles(["admin"])),
+):
+    return await service.get_list(**inspection_query.model_dump(exclude_unset=True))
+
+
+@router.get(
+    "/doctor/{id_}",
+    response_model=InspectionResponse,
+    status_code=200,
+)
+async def get_inspection_by_doctor(
+    id_: int,
+    service: Annotated[InspectionService, Depends(get_inspection_service)],
+    _role: str = Depends(required_roles(["doctor"])),
+) -> InspectionResponse:
+    return await service.get_by_id(id_)
+
+
+@router.get(
+    "/admin/{id_}",
+    response_model=InspectionResponseAdmin,
+    status_code=200,
+)
+async def get_inspection_by_admin(
+    id_: int,
+    service: Annotated[InspectionService, Depends(get_inspection_service)],
+    _role: str = Depends(required_roles(["admin"])),
+) -> InspectionResponseAdmin:
+    return await service.get_by_id(id_)
 
 
 @router.post(
@@ -89,7 +109,7 @@ async def create_inspection_by_doctor(
     service: Annotated[InspectionService, Depends(get_inspection_service)],
     doctor_id: int = Depends(get_current_user_id),
     _role: str = Depends(required_roles(["doctor"])),
-) -> InspectionResponse:
+) -> InspectionResponseDoctor:
     print("doctor_id in api", doctor_id)
     data = InspectionCreateDoctorInternal(
         **inspection.model_dump(), doctor_id=doctor_id
@@ -106,7 +126,7 @@ async def update_inspection_by_admin(
     inspection: InspectionUpdateAdmin,
     service: Annotated[InspectionService, Depends(get_inspection_service)],
     _role: str = Depends(required_roles(["admin"])),
-):
+) -> InspectionResponseAdmin:
     return await service.patch_by_admin(id_, inspection)
 
 
@@ -119,20 +139,8 @@ async def update_inspection_by_doctor(
     inspection: InspectionUpdateDoctor,
     service: Annotated[InspectionService, Depends(get_inspection_service)],
     _role: str = Depends(required_roles(["doctor"])),
-):
+) -> InspectionResponseDoctor:
     return await service.patch_by_doctor(id_, inspection)
-
-
-#
-# @router.delete(
-#     "/{id_}",
-#     status_code=204,
-# )
-# async def delete_medicine(
-#         id_: int,
-#         service: InspectionService = Depends(get_inspection_service),
-# ):
-#     return await service.remove_by_id(id_)
 
 
 @router.get("/statistics/disease_per_patient/{id_}")
@@ -143,7 +151,7 @@ async def get_inspection_statistics_disease_per_patient(
     return await service.disease_per_patient(id_)
 
 
-@router.put("/statistics/inspection_per_date/")
+@router.post("/statistics/inspection_per_date/")
 async def get_inspection_statistics_inspection_per_date(
     schema: InspectionPerDateRequest,
     service: Annotated[InspectionService, Depends(get_inspection_service)],

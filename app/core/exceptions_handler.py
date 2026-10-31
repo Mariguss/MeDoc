@@ -40,7 +40,7 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(UnauthorizedError)
     async def _(_: Request, exc: UnauthorizedError) -> JSONResponse:
-        return JSONResponse(status_code=403, content={"detail": exc.detail})
+        return JSONResponse(status_code=401, content={"detail": exc.detail})
 
     @app.exception_handler(NewException)
     async def _(_: Request, exc: NewException) -> JSONResponse:

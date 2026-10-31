@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
 )
 
 from app.core.dependencies import (
@@ -53,10 +52,7 @@ async def get_patient(
     id_: int,
     service: Annotated[PatientService, Depends(get_patient_service)],
 ):
-    employee = await service.get_by_id(id_)
-    if employee is None:
-        raise HTTPException(status_code=404, detail="Пациент не найден")
-    return employee
+    return await service.get_by_id(id_)
 
 
 @router.post(

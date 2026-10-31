@@ -13,12 +13,14 @@ from app.core.schema.base import BaseQuery
 class PatientBase(BaseModel):
     name: Annotated[str, Field(min_length=1, max_length=50)]
     sex: Sex = Sex.FEMALE
-    phone_number: Annotated[str, Field(pattern=r"^\d{11}$")]
+    phone_number: Annotated[str | None, Field(pattern=r"^\d{11}$")]
     born_date: datetime.date
     home_address: str | None = None
 
 
 class PatientResponse(PatientBase):
+    updated_at: datetime.datetime
+    created_at: datetime.datetime
     model_config = {"from_attributes": True}
 
 
