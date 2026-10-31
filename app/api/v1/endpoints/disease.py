@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -27,7 +29,7 @@ router = APIRouter(
     status_code=200,
 )
 async def get_diseases(
-    service: DiseaseService = Depends(get_disease_service),
+    service: Annotated[DiseaseService, Depends(get_disease_service)],
     page: int = 1,
     page_size: int = 10,
     ordering: str = "-id",
@@ -46,7 +48,7 @@ async def get_diseases(
 )
 async def get_disease(
     id_: int,
-    service: DiseaseService = Depends(get_disease_service),
+    service: Annotated[DiseaseService, Depends(get_disease_service)],
 ):
     disease = await service.get_by_id(id_)
     if disease is None:
@@ -61,7 +63,7 @@ async def get_disease(
 )
 async def create_disease(
     disease: DiseaseCreate,
-    service: DiseaseService = Depends(get_disease_service),
+    service: Annotated[DiseaseService, Depends(get_disease_service)],
 ) -> DiseaseResponseAdmin:
     return await service.add(disease)
 
@@ -73,7 +75,7 @@ async def create_disease(
 async def update_disease(
     id_: int,
     disease: DiseaseUpdate,
-    service: DiseaseService = Depends(get_disease_service),
+    service: Annotated[DiseaseService, Depends(get_disease_service)],
 ):
     return await service.patch(id_, disease)
 
@@ -84,6 +86,6 @@ async def update_disease(
 )
 async def delete_disease(
     id_: int,
-    service: DiseaseService = Depends(get_disease_service),
+    service: Annotated[DiseaseService, Depends(get_disease_service)],
 ):
     return await service.remove_by_id(id_)

@@ -4,6 +4,7 @@ from typing import Any
 import jwt
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from loguru import logger
 from starlette import status
 
 from app.core.config import settings
@@ -39,22 +40,6 @@ def create_jwt_token(
     return encoded_jwt, expiration_datetime
 
 
-# def verify_password(plain_password: str, hashed_password: str) -> bool:
-#     try:
-#         return bcrypt.checkpw(
-#             plain_password.encode('utf-8'),
-#             hashed_password.encode('utf-8')
-#         )
-#     except Exception:
-#         return False
-#
-# def get_password_hash(password: str) -> str:
-#     pwd_bytes = password.encode('utf-8')
-#     salt = bcrypt.gensalt()
-#     hashed = bcrypt.hashpw(pwd_bytes, salt)
-#     return hashed.decode('utf-8')
-
-
 def decode_jwt(token: str) -> dict | None:
     try:
         decoded_token = jwt.decode(
@@ -63,22 +48,21 @@ def decode_jwt(token: str) -> dict | None:
         print("decoded_token['exp']", decoded_token["exp"])
         return (
             decoded_token
-            if decoded_token["exp"] >= int(round(get_now().timestamp()))
+            if decoded_token["exp"] >= round(get_now().timestamp())
             else None
         )
-    except jwt.exceptions.ExpiredSignatureError:
+    except jwt.ExpiredSignatureError:
+        logger.exception("Ошибка в функции decode_jwt (ExpiredSignatureError)")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Срок действия токена истек, пожалуйста, авторизуйтесь заново.",
         )
-    except jwt.exceptions.PyJWTError:
+    except jwt.PyJWTError:
+        logger.exception("Ошибка в функции decode_jwt (PyJWTError)")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Невалидный токен авторизации.",
         )
-    except Exception as e:
-        print("decode_jwt", e)
-        raise e
 
 
 class JWTBearer(HTTPBearer):
@@ -110,6 +94,6 @@ class JWTBearer(HTTPBearer):
             if payload:
                 return payload
             raise AuthError(detail="Invalid token or expired token.")
-        except Exception as e:
-            print("verify_jwt", e)
+        except jwt.PyJWTError as e:
+            logger.exception(f"Ошибка в функции verify_jwt (PyJWTError): {e}")
             raise AuthError(detail="Invalid authorization code.")

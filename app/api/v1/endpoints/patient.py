@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -30,7 +32,7 @@ router = APIRouter(
     status_code=200,
 )
 async def get_patients(
-    service: PatientService = Depends(get_patient_service),
+    service: Annotated[PatientService, Depends(get_patient_service)],
     page: int = 1,
     page_size: int = 10,
     ordering: str = "-id",
@@ -49,7 +51,7 @@ async def get_patients(
 )
 async def get_patient(
     id_: int,
-    service: PatientService = Depends(get_patient_service),
+    service: Annotated[PatientService, Depends(get_patient_service)],
 ):
     employee = await service.get_by_id(id_)
     if employee is None:
@@ -64,7 +66,7 @@ async def get_patient(
 )
 async def create_patient(
     employee: PatientCreate,
-    service: PatientService = Depends(get_patient_service),
+    service: Annotated[PatientService, Depends(get_patient_service)],
 ) -> PatientResponseAdmin:
     return await service.add(employee)
 
@@ -76,7 +78,7 @@ async def create_patient(
 async def update_patient(
     id_: int,
     employee: PatientUpdate,
-    service: PatientService = Depends(get_patient_service),
+    service: Annotated[PatientService, Depends(get_patient_service)],
 ):
     return await service.patch(id_, employee)
 
@@ -87,6 +89,6 @@ async def update_patient(
 )
 async def delete_patient(
     id_: int,
-    service: PatientService = Depends(get_patient_service),
+    service: Annotated[PatientService, Depends(get_patient_service)],
 ):
     return await service.remove_by_id(id_)
