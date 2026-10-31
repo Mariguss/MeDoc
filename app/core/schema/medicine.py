@@ -12,6 +12,7 @@ class MedicineBase(BaseModel):
     name: Annotated[str, Field(min_length=1, max_length=50)]
     properties: str
     side_effects: str
+    manufacturer: Annotated[str | None, Field(max_length=100)] = None
 
 
 class MedicineResponse(MedicineBase):
@@ -29,6 +30,7 @@ class MedicineUpdate(BaseModel):
     name: Annotated[str | None, Field(min_length=1, max_length=50)] = None
     properties: str | None = None
     side_effects: str | None = None
+    manufacturer: Annotated[str | None, Field(max_length=100)] = None
 
 
 class MedicineQuery(BaseQuery, MedicineBase): ...
