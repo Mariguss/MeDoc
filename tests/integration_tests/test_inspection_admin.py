@@ -53,6 +53,93 @@ async def test_create_item(client, session, as_admin):
 
 
 @pytest.mark.asyncio
+async def test_create_item_404_patient(client, session, as_admin):
+    add_data = copy(inspection_add)
+
+    add_data_doctor = copy(doctor_add)
+    password_hash = get_password_hash(str(add_data_doctor.pop("password")))
+    test_doctor = Employee(**add_data_doctor, password_hash=password_hash)
+    session.add(test_doctor)
+    await session.flush()
+    doctor_id = test_doctor.id
+
+    add_data_patient = copy(patient_add)
+    born_date = datetime.date.fromisoformat(add_data_patient.pop("born_date"))
+    test_patient = Patient(**add_data_patient, born_date=born_date)
+    session.add(test_patient)
+    await session.flush()
+    patient_id = test_patient.id
+
+    await session.commit()
+
+    res = await client.get(f"/employee/{doctor_id}")
+    print(res.json())
+
+    add_data["patient_id"] = patient_id + 100
+    add_data["doctor_id"] = doctor_id
+    response_1 = await client.post("/inspection/admin/", json=add_data)
+    assert response_1.status_code == 404
+    assert "Пациент" in response_1.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_create_item_404_doctor(client, session, as_admin):
+    add_data = copy(inspection_add)
+
+    add_data_doctor = copy(doctor_add)
+    password_hash = get_password_hash(str(add_data_doctor.pop("password")))
+    test_doctor = Employee(**add_data_doctor, password_hash=password_hash)
+    session.add(test_doctor)
+    await session.flush()
+    doctor_id = test_doctor.id
+
+    add_data_patient = copy(patient_add)
+    born_date = datetime.date.fromisoformat(add_data_patient.pop("born_date"))
+    test_patient = Patient(**add_data_patient, born_date=born_date)
+    session.add(test_patient)
+    await session.flush()
+    patient_id = test_patient.id
+
+    await session.commit()
+
+    add_data["patient_id"] = patient_id
+    add_data["doctor_id"] = doctor_id + 100
+    response_2 = await client.post("/inspection/admin/", json=add_data)
+    assert response_2.status_code == 404
+    assert "Доктор" in response_2.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_create_item_404_patient_doctor(client, session, as_admin):
+    add_data = copy(inspection_add)
+
+    add_data_doctor = copy(doctor_add)
+    password_hash = get_password_hash(str(add_data_doctor.pop("password")))
+    test_doctor = Employee(**add_data_doctor, password_hash=password_hash)
+    session.add(test_doctor)
+    await session.flush()
+    doctor_id = test_doctor.id
+
+    add_data_patient = copy(patient_add)
+    born_date = datetime.date.fromisoformat(add_data_patient.pop("born_date"))
+    test_patient = Patient(**add_data_patient, born_date=born_date)
+    session.add(test_patient)
+    await session.flush()
+    patient_id = test_patient.id
+
+    await session.commit()
+
+    add_data["patient_id"] = 0
+    add_data["doctor_id"] = 0
+    response_3 = await client.post("/inspection/admin/", json=add_data)
+    assert response_3.status_code == 404
+    print(response_3.json())
+    print(doctor_id, add_data["doctor_id"])
+    print(patient_id, add_data["patient_id"])
+    assert "Доктор" in response_3.json()["detail"]
+
+
+@pytest.mark.asyncio
 async def test_read_item(session, client, as_admin):
     # Передаем db_session прямо в тест для изолированной вставки данных
     add_data_doctor = copy(doctor_add)
