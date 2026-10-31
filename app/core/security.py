@@ -45,7 +45,6 @@ def decode_jwt(token: str) -> dict | None:
         decoded_token = jwt.decode(
             token, settings.token.secret_key, algorithms=ALGORITHM
         )
-        print("decoded_token['exp']", decoded_token["exp"])
         return (
             decoded_token
             if decoded_token["exp"] >= round(get_now().timestamp())
