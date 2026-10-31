@@ -17,3 +17,4 @@ class Medicine(BaseWithId):
     properties: Mapped[str]
     side_effects: Mapped[str]
     manufacturer: Mapped[str | None] = mapped_column(String(100), default=None)
+    dosage_form: Mapped[str | None] = mapped_column(String(50), default=None)
