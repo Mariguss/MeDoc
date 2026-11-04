@@ -7,12 +7,12 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.sql.functions import func
 
-from app.util.date import get_now
+from app.util.date import get_now_naive
 
 
 class CreatedAtMixin:
     created_at: Mapped[datetime.datetime | None] = mapped_column(
         DateTime,
-        default=get_now,
+        default=get_now_naive,
         server_default=func.now(),
     )
